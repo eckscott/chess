@@ -7,18 +7,58 @@ public class BishopMovesCalc implements PieceMovesCalc {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        int newRow = myPosition.getRow();
-        int newCol = myPosition.getColumn();
 
-        for(int i = 1; i < 8; i++){
-            if (myPosition.getRow() < 8 && myPosition.getColumn() < 8){ 
-                newRow = myPosition.getRow() + 1;
-                newCol = myPosition.getColumn() + 1;
-            }
-            ChessPosition newPosition = new ChessPosition(newRow, newCol);
+        //up right
+        int r = myPosition.getRow();
+        int c = myPosition.getColumn();
+        while (true) {
+            r++;
+            c++;
+            if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                break;
+
+            ChessPosition newPosition = new ChessPosition(r, c);
             moves.add(new ChessMove(myPosition, newPosition, null));
-        }    
-          
+        }
+
+        // down right
+        r = myPosition.getRow();
+        c = myPosition.getColumn();
+        while (true) {
+            r--;
+            c++;
+            if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                break;
+
+            ChessPosition newPosition = new ChessPosition(r, c);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
+
+        // down left
+        r = myPosition.getRow();
+        c = myPosition.getColumn();
+        while (true) {
+            r--;
+            c--;
+            if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                break;
+
+            ChessPosition newPosition = new ChessPosition(r, c);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
+
+        // up left
+        r = myPosition.getRow();
+        c = myPosition.getColumn();
+        while (true) {
+            r++;
+            c--;
+            if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                break;
+
+            ChessPosition newPosition = new ChessPosition(r, c);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         return moves;
     }
 
