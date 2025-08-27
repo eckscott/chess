@@ -8,6 +8,5 @@ public interface PieceMovesCalc {
     final int MAX_COL = 8;
     final int MIN_COL = 1;
 
-
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 }

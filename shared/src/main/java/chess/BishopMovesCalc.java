@@ -18,7 +18,10 @@ public class BishopMovesCalc implements PieceMovesCalc {
                 break;
 
             ChessPosition newPosition = new ChessPosition(r, c);
-            moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) == null)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            else
+                break;
         }
 
         // down right
@@ -31,7 +34,10 @@ public class BishopMovesCalc implements PieceMovesCalc {
                 break;
 
             ChessPosition newPosition = new ChessPosition(r, c);
-            moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) == null)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            else
+                break;
         }
 
         // down left
@@ -44,7 +50,10 @@ public class BishopMovesCalc implements PieceMovesCalc {
                 break;
 
             ChessPosition newPosition = new ChessPosition(r, c);
-            moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) == null)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            else
+                break;
         }
 
         // up left
@@ -57,7 +66,10 @@ public class BishopMovesCalc implements PieceMovesCalc {
                 break;
 
             ChessPosition newPosition = new ChessPosition(r, c);
-            moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) == null)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            else
+                break;
         }
         return moves;
     }
