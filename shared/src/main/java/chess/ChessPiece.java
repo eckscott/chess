@@ -60,6 +60,9 @@ public class ChessPiece {
             case BISHOP:
                 calc = new BishopMovesCalc();
                 break;
+            case KING:
+                calc = new KingMovesCalc();
+                break;
             default:
                 return List.of();
         }
