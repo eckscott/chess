@@ -7,6 +7,7 @@ public class BishopMovesCalc implements PieceMovesCalc {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currPiece = board.getPiece(myPosition);
 
         //up right
         int r = myPosition.getRow();
@@ -20,8 +21,16 @@ public class BishopMovesCalc implements PieceMovesCalc {
             ChessPosition newPosition = new ChessPosition(r, c);
             if (board.getPiece(newPosition) == null)
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            else
-                break;
+            else{
+                ChessPiece newPositionPiece = board.getPiece(newPosition);
+                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
+                }
+                else
+                    break;
+            }
+                
         }
 
         // down right
@@ -36,8 +45,15 @@ public class BishopMovesCalc implements PieceMovesCalc {
             ChessPosition newPosition = new ChessPosition(r, c);
             if (board.getPiece(newPosition) == null)
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            else
-                break;
+            else{
+                ChessPiece newPositionPiece = board.getPiece(newPosition);
+                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
+                }
+                else
+                    break;
+            }
         }
 
         // down left
@@ -52,8 +68,15 @@ public class BishopMovesCalc implements PieceMovesCalc {
             ChessPosition newPosition = new ChessPosition(r, c);
             if (board.getPiece(newPosition) == null)
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            else
-                break;
+            else{
+                ChessPiece newPositionPiece = board.getPiece(newPosition);
+                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
+                }
+                else
+                    break;
+            }
         }
 
         // up left
@@ -68,8 +91,15 @@ public class BishopMovesCalc implements PieceMovesCalc {
             ChessPosition newPosition = new ChessPosition(r, c);
             if (board.getPiece(newPosition) == null)
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            else
-                break;
+            else{
+                ChessPiece newPositionPiece = board.getPiece(newPosition);
+                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
+                }
+                else
+                    break;
+            }
         }
         return moves;
     }
