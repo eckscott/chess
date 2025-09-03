@@ -43,7 +43,25 @@ public class ChessMove {
         return promotionPiece;
     }
 
+    @Override
     public String toString() {
         return String.format("[%s%s]", startPosition, endPosition);
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        // initial checks
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+
+        ChessMove move = (ChessMove)obj;
+
+        return (this.startPosition.equals(move.startPosition) &&
+                this.endPosition.equals(move.endPosition) &&
+                this.promotionPiece.equals(move.promotionPiece));
     }
 }

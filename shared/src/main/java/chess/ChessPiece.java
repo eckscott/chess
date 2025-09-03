@@ -68,4 +68,7 @@ public class ChessPiece {
         }
         return calc.pieceMoves(board, myPosition);
     }
+
+    // override equals
+    
 }

@@ -43,6 +43,46 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        // white team
+        board[1 - BOARD_TO_ARRAY]
+             [1 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        board[1 - BOARD_TO_ARRAY]
+             [2 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[1 - BOARD_TO_ARRAY]
+             [3 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[1 - BOARD_TO_ARRAY]
+             [4 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        board[1 - BOARD_TO_ARRAY]
+             [5 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        board[1 - BOARD_TO_ARRAY]
+             [6 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[1 - BOARD_TO_ARRAY]
+             [7 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[1 - BOARD_TO_ARRAY]
+             [8 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        for (int i = 0; i < 8; i++) {
+            board[2 - BOARD_TO_ARRAY][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        }
+
+        // black team
+        board[8 - BOARD_TO_ARRAY]
+             [1 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        board[8 - BOARD_TO_ARRAY]
+             [2 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[8 - BOARD_TO_ARRAY]
+             [3 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[8 - BOARD_TO_ARRAY]
+             [4 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        board[8 - BOARD_TO_ARRAY]
+             [5 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        board[8 - BOARD_TO_ARRAY]
+             [6 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[8 - BOARD_TO_ARRAY]
+             [7 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[8 - BOARD_TO_ARRAY]
+             [8 - BOARD_TO_ARRAY] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        for (int i = 0; i < 8; i++) {
+            board[7 - BOARD_TO_ARRAY][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        }
     }
 }
