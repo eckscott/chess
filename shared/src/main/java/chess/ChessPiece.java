@@ -70,5 +70,25 @@ public class ChessPiece {
     }
 
     // override equals
+    @Override
+    public boolean equals(Object obj) {
+        // initial checks
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+
+        ChessPiece p = (ChessPiece)obj;
+
+        return (this.type.equals(p.type));
+    }
+    
+    // override hashCode
+    @Override
+    public int hashCode() {
+        return (type.hashCode());
+    }
     
 }

@@ -33,7 +33,28 @@ public class ChessPosition {
         return COL;
     }
 
+    @Override
     public String toString() {
         return String.format("[%d, %d]", ROW, COL);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // initial checks
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+
+        ChessPosition pos = (ChessPosition) obj;
+
+        return ((this.ROW == pos.ROW) && (this.COL == pos.COL));
+    }
+
+    @Override
+    public int hashCode() {
+        return(ROW ^ COL);
     }
 }

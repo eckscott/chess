@@ -64,4 +64,9 @@ public class ChessMove {
                 this.endPosition.equals(move.endPosition) &&
                 this.promotionPiece.equals(move.promotionPiece));
     }
+
+    @Override
+    public int hashCode() {
+        return (startPosition.hashCode() ^ endPosition.hashCode() & promotionPiece.hashCode());
+    }
 }
