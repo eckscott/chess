@@ -66,6 +66,7 @@ public class ChessPiece {
                 break;
             case KNIGHT:
                 calc = new KnightMovesCalc();
+                break;
             default:
                 return List.of();
         }
