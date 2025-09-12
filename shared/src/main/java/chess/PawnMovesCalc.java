@@ -22,7 +22,8 @@ public class PawnMovesCalc implements PieceMovesCalc {
                 }
                 // promotion
                 if (newPosition.getRow() == MAX_ROW){
-                    
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
+
                 }
                 else
                     moves.add(new ChessMove(myPosition, newPosition, null));
