@@ -22,8 +22,10 @@ public class PawnMovesCalc implements PieceMovesCalc {
                 }
                 // promotion
                 if (newPosition.getRow() == MAX_ROW){
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
                     moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
-
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
                 }
                 else
                     moves.add(new ChessMove(myPosition, newPosition, null));
@@ -33,16 +35,32 @@ public class PawnMovesCalc implements PieceMovesCalc {
                 ChessPosition enemyPiecePos1 = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
                 if (board.getPiece(enemyPiecePos1) != null){
                     ChessPiece enemyPiece1 = board.getPiece(enemyPiecePos1);
-                    if (currPiece.getTeamColor() != enemyPiece1.getTeamColor())
-                        moves.add(new ChessMove(myPosition, enemyPiecePos1, null));
+                    if (currPiece.getTeamColor() != enemyPiece1.getTeamColor()) {
+                        if (enemyPiecePos1.getRow() == MAX_ROW){
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.ROOK));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.KNIGHT));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.BISHOP));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.QUEEN));
+                        }
+                        else
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, null));
+                    }
                 }
             }
             if (myPosition.getColumn() > MIN_COL){
                 ChessPosition enemyPiecePos2 = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
                 if (board.getPiece(enemyPiecePos2) != null){
                     ChessPiece enemyPiece2 = board.getPiece(enemyPiecePos2);
-                    if (currPiece.getTeamColor() != enemyPiece2.getTeamColor())
-                        moves.add(new ChessMove(myPosition, enemyPiecePos2, null));
+                    if (currPiece.getTeamColor() != enemyPiece2.getTeamColor()) {
+                        if (enemyPiecePos2.getRow() == MAX_ROW){
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.ROOK));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.KNIGHT));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.BISHOP));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.QUEEN));
+                        }
+                        else
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, null));
+                    }
                 }
             } 
         }
@@ -59,7 +77,10 @@ public class PawnMovesCalc implements PieceMovesCalc {
                 }
                 // promotion
                 if (newPosition.getRow() == MIN_ROW){
-
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
                 }
                 else
                     moves.add(new ChessMove(myPosition, newPosition, null));
@@ -69,16 +90,32 @@ public class PawnMovesCalc implements PieceMovesCalc {
                 ChessPosition enemyPiecePos1 = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
                 if (board.getPiece(enemyPiecePos1) != null){
                     ChessPiece enemyPiece1 = board.getPiece(enemyPiecePos1);
-                    if (currPiece.getTeamColor() != enemyPiece1.getTeamColor())
-                        moves.add(new ChessMove(myPosition, enemyPiecePos1, null));
+                    if (currPiece.getTeamColor() != enemyPiece1.getTeamColor()) {
+                        if (enemyPiecePos1.getRow() == MIN_ROW) {
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.ROOK));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.KNIGHT));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.BISHOP));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, ChessPiece.PieceType.QUEEN));
+                        }
+                        else
+                            moves.add(new ChessMove(myPosition, enemyPiecePos1, null));
+                    }
                 }
             }
             if (myPosition.getColumn() > MIN_COL){
                 ChessPosition enemyPiecePos2 = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
                 if (board.getPiece(enemyPiecePos2) != null){
                     ChessPiece enemyPiece2 = board.getPiece(enemyPiecePos2);
-                    if (currPiece.getTeamColor() != enemyPiece2.getTeamColor())
-                        moves.add(new ChessMove(myPosition, enemyPiecePos2, null));
+                    if (currPiece.getTeamColor() != enemyPiece2.getTeamColor()){
+                        if (enemyPiecePos2.getRow() == MIN_ROW) {
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.ROOK));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.KNIGHT));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.BISHOP));
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, ChessPiece.PieceType.QUEEN));
+                        }
+                        else
+                            moves.add(new ChessMove(myPosition, enemyPiecePos2, null));
+                    }
                 }
             }
         }
