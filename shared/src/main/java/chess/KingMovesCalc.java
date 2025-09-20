@@ -9,106 +9,24 @@ public class KingMovesCalc implements PieceMovesCalc {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece currPiece = board.getPiece(myPosition);
 
-        // right
-        if (myPosition.getColumn() < MAX_COL){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
+        int[] rowDirections = {0, 1, 1, 1, 0, -1, -1, -1};
+        int[] colDirections = {1, 1, 0, -1, -1, -1, 0, 1};
+        for(int i = 0; i < rowDirections.length; i++){
+            // initial checks to not go out of bounds
+            if (myPosition.getRow() + rowDirections[i] <= MAX_ROW &&
+                myPosition.getRow() + rowDirections[i] >= MIN_ROW &&
+                myPosition.getColumn() + colDirections[i] <= MAX_COL &&
+                myPosition.getColumn() + colDirections[i] >= MIN_COL){
+                ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowDirections[i],
+                                                              myPosition.getColumn() + colDirections[i]);
 
-        // up right
-        if (myPosition.getColumn() < MAX_COL && myPosition.getRow() < MAX_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                if (board.getPiece(newPosition) == null)
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // up
-        if (myPosition.getRow() < MAX_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // up left
-        if (myPosition.getColumn() > MIN_COL && myPosition.getRow() < MAX_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // Left
-        if (myPosition.getColumn() > MIN_COL){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn() - 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // down left
-        if (myPosition.getColumn() > MIN_COL && myPosition.getRow() > MIN_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // down
-        if (myPosition.getRow() > MIN_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
-
-        // down right
-        if (myPosition.getColumn() < MAX_COL && myPosition.getRow() > MIN_ROW){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else {
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-                if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, newPosition, null));
+                else {
+                    ChessPiece newPositionPiece = board.getPiece(newPosition);
+                    if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    }
                 }
             }
         }
