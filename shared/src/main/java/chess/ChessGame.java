@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -124,4 +125,5 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
 }
