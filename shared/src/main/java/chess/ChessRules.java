@@ -60,32 +60,58 @@ public class ChessRules extends ChessGame{
     }
 
     /**
-     * Check if enemy moves have an endPosition on the King Position (check)
-     * @param  enemyMoves
-     * @param kingPosition
+     * Blocker help function
+     * @param startPosition
+     * @param endPosition
+     * @return collection of block positions
      */
-    public boolean check(Collection<ChessMove> enemyMoves, ChessPosition kingPosition){
-        Collection<ChessPosition> endPositions = endPositions(enemyMoves);
-        if (endPositions.contains(kingPosition)) return true;
-        return false;
+    public Collection<ChessPosition> blockPositions(ChessPosition startPosition, ChessPosition endPosition){
+
+        Collection<ChessPosition> blockPositions = new ArrayList<>();
+        int rDiff = endPosition.getRow() - startPosition.getRow();
+        int cDiff = endPosition.getColumn() - startPosition.getColumn();
+
+        // absolute difference
+        if (rDiff < 0) rDiff = rDiff * (-1);
+        if (cDiff < 0) cDiff = cDiff * (-1);
+
     }
-
     /**
-     * Get Game Status
-     * @return a string indicating the status of the game
-     * e.g
-     * "check-white", "checkmate-white", "stalemate-white", or "nothing"
-     * Same for black
+     * Check if teamColor is in check
+     * @param teamColor
+     * @param teamMoves
+     * @return String with game status
      */
-    public String gameStatus(){
-        Collection<ChessMove> whiteMoves = teamMoves(WHITE);
-        Collection<ChessMove> blackMoves = teamMoves(BLACK);
 
-        // check for white trouble first
-        if (teamTurn == WHITE){
-            if (check(blackMoves, getKing(WHITE))){
+    public String teamStatus(TeamColor teamColor, Collection<ChessMove> teamMoves){
+        for (int r = 1; r <= 8; r++){
+            for (int c = 1; c <= 8; c++){
+                ChessPosition enemyPos = new ChessPosition(r, c);
+                // if there is an enemy piece at enemyPos
+                if (board.getPiece(enemyPos) != null && board.getPiece(enemyPos).getTeamColor() == teamColor){
+                    ChessPiece piece = board.getPiece(enemyPos);
+                    // all the possible moves for this one piece
+                    Collection<ChessMove> enemyPieceMoves = piece.pieceMoves(board, enemyPos);
+                    // if this piece can move to the king we are in check
+                    if (endPositions(enemyPieceMoves).contains(getKing(teamColor))){
+                        /*
+                        3 conditions to differentiate check and checkmate
+                        1. enemy piece can be taken
+                        2. enemy move can be blocked
+                        3. king can move
+                         */
+                        ChessPiece king = board.getPiece(getKing(teamColor));
+                        Collection<ChessMove> kingMoves = king.pieceMoves(board, getKing(teamColor));
+                        if (!endPositions(teamMoves).contains(enemyPos) ||
 
+                            enemyPieceMoves.containsAll(kingMoves))
+                        return "check";
+                    }
+                }
             }
         }
+
+        return "nothing";
     }
+
 }
