@@ -71,10 +71,26 @@ public class ChessRules extends ChessGame{
         int rDiff = endPosition.getRow() - startPosition.getRow();
         int cDiff = endPosition.getColumn() - startPosition.getColumn();
 
-        // absolute difference
-        if (rDiff < 0) rDiff = rDiff * (-1);
-        if (cDiff < 0) cDiff = cDiff * (-1);
+        // up move
+        if (rDiff > 0 && cDiff == 0){
 
+        }
+        // down move
+        if (rDiff < 0 && cDiff == 0){
+
+        }
+        // left move
+        if (cDiff > 0 && rDiff == 0){
+
+        }
+        // right move
+        if (cDiff < 0 && rDiff == 0){
+
+        }
+        // TODO: ADD DIAGNAL MOVES
+
+
+        return blockPositions;
     }
     /**
      * Check if teamColor is in check
