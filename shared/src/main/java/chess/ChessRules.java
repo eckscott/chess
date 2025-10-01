@@ -3,11 +3,11 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static chess.ChessGame.TeamColor.BLACK;
-import static chess.ChessGame.TeamColor.WHITE;
-
 public class ChessRules extends ChessGame{
 
+    public ChessRules(ChessBoard board){
+        this.board = board;
+    }
     /**
      * Get the King's position
      * @return the position
@@ -17,7 +17,8 @@ public class ChessRules extends ChessGame{
         for (int r = 1; r <= 8; r++){
             for (int c = 1; c <= 8; c++){
                 ChessPosition kingPos = new ChessPosition(r, c);
-                if (board.getPiece(kingPos).getPieceType() == ChessPiece.PieceType.KING &&
+                if (board.getPiece(kingPos) != null &&
+                        board.getPiece(kingPos).getPieceType() == ChessPiece.PieceType.KING &&
                         board.getPiece(kingPos).getTeamColor() == teamColor)
                     return kingPos;
             }
@@ -47,9 +48,10 @@ public class ChessRules extends ChessGame{
         return teamMoves;
     }
 
+
     /**
      * Return end positions of each ChessMove
-     * @param teamMoves
+     * @param teamMoves the teamsMoves
      * @return Collection<ChessPosition> endPositions
      */
     public Collection<ChessPosition> endPositions(Collection<ChessMove> teamMoves){
@@ -61,8 +63,8 @@ public class ChessRules extends ChessGame{
 
     /**
      * Blocker help function
-     * @param startPosition
-     * @param endPosition
+     * @param startPosition start position of attacking piece
+     * @param endPosition end position of
      * @return collection of block positions
      */
     public Collection<ChessPosition> blockPositions(ChessPosition startPosition, ChessPosition endPosition){
@@ -73,61 +75,144 @@ public class ChessRules extends ChessGame{
 
         // up move
         if (rDiff > 0 && cDiff == 0){
-
+            for (int i = 1; i <= rDiff; i++){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn());
+                blockPositions.add(blockPos);
+            }
         }
         // down move
         if (rDiff < 0 && cDiff == 0){
-
+            for (int i = -1; i >= rDiff; i--){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn());
+                blockPositions.add(blockPos);
+            }
         }
         // left move
-        if (cDiff > 0 && rDiff == 0){
-
+        if (cDiff < 0 && rDiff == 0){
+            for (int i = -1; i >= cDiff; i--){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow(), startPosition.getColumn() + i);
+                blockPositions.add(blockPos);
+            }
         }
         // right move
-        if (cDiff < 0 && rDiff == 0){
-
+        if (cDiff > 0 && rDiff == 0){
+            for (int i = 1; i <= cDiff; i++){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow(), startPosition.getColumn() + i);
+                blockPositions.add(blockPos);
+            }
         }
-        // TODO: ADD DIAGNAL MOVES
-
+        // up right
+        if (rDiff > 0 && cDiff > 0){
+            for (int i = 1; i <= cDiff; i++){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn() + i);
+                blockPositions.add(blockPos);
+            }
+        }
+        // up left
+        if (rDiff > 0 && cDiff < 0){
+            for (int i = 1; i <= rDiff; i++){
+                int j = i * -1;
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn() + j);
+                blockPositions.add(blockPos);
+            }
+        }
+        // down left
+        if (rDiff < 0 && cDiff < 0){
+            for (int i = -1; i >= rDiff; i--){
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn() + i);
+                blockPositions.add(blockPos);
+            }
+        }
+        // down right
+        if (rDiff < 0 && cDiff > 0){
+            for (int j = 1; j <= cDiff; j++){
+                int i = j * -1;
+                ChessPosition blockPos = new ChessPosition(startPosition.getRow() + i, startPosition.getColumn() + j);
+                blockPositions.add(blockPos);
+            }
+        }
 
         return blockPositions;
     }
     /**
-     * Check if teamColor is in check
-     * @param teamColor
-     * @param teamMoves
-     * @return String with game status
+     * Boolean to see if teamMoves can Block
+     * @param teamMoves teammates moves
+     * @param blockPositions the positions the teammate has to land in to block
+     * @return true or false
      */
+    public boolean canBlock(Collection<ChessMove> teamMoves, Collection<ChessPosition> blockPositions){
+        for(ChessMove move : teamMoves){
+            if (blockPositions.contains(move.getEndPosition())) return true;
+        }
+        return false;
+    }
 
-    public String teamStatus(TeamColor teamColor, Collection<ChessMove> teamMoves){
-        for (int r = 1; r <= 8; r++){
-            for (int c = 1; c <= 8; c++){
+    @Override
+    public boolean isInStalemate(TeamColor teamColor) {
+        if (teamColor == TeamColor.WHITE){
+            Collection<ChessMove> teamMoves = teamMoves(teamColor);
+            Collection<ChessMove> enemyMoves = teamMoves(TeamColor.BLACK);
+            ChessPiece king = board.getPiece(getKing(teamColor));
+            Collection<ChessMove> kingMoves = king.pieceMoves(board, getKing(teamColor));
+            if (!endPositions(enemyMoves).contains(getKing(teamColor)) &&
+                endPositions(enemyMoves).containsAll(endPositions(kingMoves)) &&
+                teamMoves == kingMoves)
+                return true;
+        }
+        if (teamColor == TeamColor.BLACK){
+            Collection<ChessMove> teamMoves = teamMoves(teamColor);
+            Collection<ChessMove> enemyMoves = teamMoves(TeamColor.WHITE);
+            ChessPiece king = board.getPiece(getKing(teamColor));
+            Collection<ChessMove> kingMoves = king.pieceMoves(board, getKing(teamColor));
+            if (!endPositions(enemyMoves).contains(getKing(teamColor)) &&
+                    endPositions(enemyMoves).containsAll(endPositions(kingMoves)) &&
+                    teamMoves == kingMoves)
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isInCheck(TeamColor teamColor) {
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
                 ChessPosition enemyPos = new ChessPosition(r, c);
-                // if there is an enemy piece at enemyPos
-                if (board.getPiece(enemyPos) != null && board.getPiece(enemyPos).getTeamColor() == teamColor){
+                if (board.getPiece(enemyPos) != null && board.getPiece(enemyPos).getTeamColor() != teamColor) {
                     ChessPiece piece = board.getPiece(enemyPos);
-                    // all the possible moves for this one piece
                     Collection<ChessMove> enemyPieceMoves = piece.pieceMoves(board, enemyPos);
-                    // if this piece can move to the king we are in check
-                    if (endPositions(enemyPieceMoves).contains(getKing(teamColor))){
-                        /*
-                        3 conditions to differentiate check and checkmate
-                        1. enemy piece can be taken
-                        2. enemy move can be blocked
-                        3. king can move
-                         */
-                        ChessPiece king = board.getPiece(getKing(teamColor));
-                        Collection<ChessMove> kingMoves = king.pieceMoves(board, getKing(teamColor));
-                        if (!endPositions(teamMoves).contains(enemyPos) ||
-
-                            enemyPieceMoves.containsAll(kingMoves))
-                        return "check";
-                    }
+                    if (endPositions(enemyPieceMoves).contains(getKing(teamColor)))
+                        return true;
                 }
             }
         }
+        return false;
+    }
 
-        return "nothing";
+    @Override
+    public boolean isInCheckmate(TeamColor teamColor){
+        try {
+            if (isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves(teamColor))) return true;
+        } catch (InvalidMoveException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+    /**
+     * Checks into the future if I can make a move. Used to differentiate between check and checkmate
+     * @param teamColor team checking if in check
+     * @param teamMoves moves of this team
+     * @return true if making the move no longer puts you in check, false if it keeps you in check
+     * @throws InvalidMoveException
+     */
+    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws InvalidMoveException {
+        for (ChessMove move : teamMoves){
+            ChessBoard copyBoard = board;
+            ChessGame copyGame = new ChessGame(copyBoard);
+            copyGame.makeMove(move);
+            if (!copyGame.isInCheck(teamColor)) return true;
+        }
+        return false;
     }
 
 }

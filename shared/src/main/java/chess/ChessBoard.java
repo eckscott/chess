@@ -91,9 +91,17 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        String boardToString = "";
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                if (board[i][j] != null){
+                    ChessPosition pos = new ChessPosition(i + 1, j + 1);
+                    boardToString += String.format("%s = [%s]\n", board[i][j], pos);
+                }
+
+            }
+        }
+        return boardToString;
     }
 
     @Override
