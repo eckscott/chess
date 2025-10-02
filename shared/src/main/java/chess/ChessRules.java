@@ -192,7 +192,7 @@ public class ChessRules extends ChessGame{
     public boolean isInCheckmate(TeamColor teamColor){
         try {
             if (isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves(teamColor))) return true;
-        } catch (InvalidMoveException e) {
+        } catch (InvalidMoveException | CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
         return false;
@@ -205,12 +205,12 @@ public class ChessRules extends ChessGame{
      * @return true if making the move no longer puts you in check, false if it keeps you in check
      * @throws InvalidMoveException
      */
-    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws InvalidMoveException {
+    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws InvalidMoveException, CloneNotSupportedException {
+        ChessBoard copyBoard = board.clone();
         for (ChessMove move : teamMoves){
-            ChessBoard copyBoard = board;
-            ChessGame copyGame = new ChessGame(copyBoard);
-            copyGame.makeMove(move);
-            if (!copyGame.isInCheck(teamColor)) return true;
+            board = copyBoard.clone();
+            makeMove(move);
+            if (!isInCheck(teamColor)) return true;
         }
         return false;
     }
