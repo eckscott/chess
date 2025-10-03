@@ -78,16 +78,14 @@ public class ChessGame {
     }
 
     public void forceMove(ChessMove move){
-        if (teamTurn == board.getPiece(move.getStartPosition()).getTeamColor()){
-            if (move.getPromotionPiece() == null) {
-                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-                board.addPiece(move.getStartPosition(), null);
-            }
-            else {
-                board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
-                        move.getPromotionPiece()));
-                board.addPiece(move.getStartPosition(), null);
-            }
+        if (move.getPromotionPiece() == null) {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.addPiece(move.getStartPosition(), null);
+        }
+        else {
+            board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
+                    move.getPromotionPiece()));
+            board.addPiece(move.getStartPosition(), null);
         }
     }
 
