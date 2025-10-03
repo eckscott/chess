@@ -67,6 +67,7 @@ public class ChessGame {
                 if(isInCheck(team))
                     removeMoves.add(illegalMove);
             }
+            board = copyBoard.clone();
         }
         catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
@@ -179,7 +180,7 @@ public class ChessGame {
         ChessBoard copyBoard = board.clone();
         for (ChessMove move : teamMoves){
             board = copyBoard.clone();
-            makeMove(move);
+            forceMove(move);
             if (!isInCheck(teamColor)) return true;
         }
         return false;
