@@ -100,17 +100,8 @@ public class ChessGame {
             throw new InvalidMoveException("Nothing here");
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (validMoves.contains(move) && (teamTurn == board.getPiece(move.getStartPosition()).getTeamColor())){
-            if (move.getPromotionPiece() == null) {
-                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-                board.addPiece(move.getStartPosition(), null);
-                teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-            }
-            else {
-                board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
-                                                      move.getPromotionPiece()));
-                board.addPiece(move.getStartPosition(), null);
-                teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-            }
+            forceMove(move);
+            teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         }
         else
             throw new InvalidMoveException("Invalid Move!");
@@ -146,7 +137,7 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         try {
             if (isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves(teamColor))) return true;
-        } catch (InvalidMoveException | CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
         return false;
@@ -162,12 +153,9 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         Collection<ChessMove> teamMoves = teamMoves(teamColor);
         try {
-            if (!isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves))
-                return true;
-            return false;
-        } catch (InvalidMoveException e) {
-            throw new RuntimeException(e);
-        } catch (CloneNotSupportedException e) {
+            return !isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves);
+        }
+        catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -177,9 +165,8 @@ public class ChessGame {
      * @param teamColor team checking if in check
      * @param teamMoves moves of this team
      * @return true if making the move no longer puts you in check, false if it keeps you in check
-     * @throws InvalidMoveException
      */
-    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws InvalidMoveException, CloneNotSupportedException {
+    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws CloneNotSupportedException {
         ChessBoard copyBoard = board.clone();
         for (ChessMove move : teamMoves){
             board = copyBoard.clone();
