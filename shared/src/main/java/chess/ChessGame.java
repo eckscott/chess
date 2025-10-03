@@ -120,7 +120,8 @@ public class ChessGame {
                 if (board.getPiece(enemyPos) != null && board.getPiece(enemyPos).getTeamColor() != teamColor) {
                     ChessPiece piece = board.getPiece(enemyPos);
                     Collection<ChessMove> enemyPieceMoves = piece.pieceMoves(board, enemyPos);
-                    if (endPositions(enemyPieceMoves).contains(getKing(teamColor)))
+                    ChessPosition king = finder.find(teamColor, ChessPiece.PieceType.KING);
+                    if (endPositions(enemyPieceMoves).contains(king))
                         return true;
                 }
             }
@@ -209,23 +210,23 @@ public class ChessGame {
     }
 
     /**
-     * Get the King's position
-     * @return the position
-     * @param teamColor the team
+     * Find any piece on the board
+     *
+     * @param teamColor
+     * @param piece
      */
-    public ChessPosition getKing(TeamColor teamColor){
+    PieceFinder finder = (teamColor, pieceType) -> {
         for (int r = 1; r <= 8; r++){
             for (int c = 1; c <= 8; c++){
-                ChessPosition kingPos = new ChessPosition(r, c);
-                if (board.getPiece(kingPos) != null &&
-                        board.getPiece(kingPos).getPieceType() == ChessPiece.PieceType.KING &&
-                        board.getPiece(kingPos).getTeamColor() == teamColor)
-                    return kingPos;
+                ChessPosition piecePos = new ChessPosition(r, c);
+                if (board.getPiece(piecePos) != null &&
+                    board.getPiece(piecePos).getPieceType() == pieceType &&
+                    board.getPiece(piecePos).getTeamColor() == teamColor)
+                    return piecePos;
             }
         }
-        // out of bounds but needs a return statement
-        return new ChessPosition(0, 0);
-    }
+        return null;
+    };
 
     /**
      * Sets this game's chessboard with a given board
