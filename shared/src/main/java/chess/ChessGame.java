@@ -60,19 +60,15 @@ public class ChessGame {
         ChessGame.TeamColor team = board.getPiece(startPosition).getTeamColor();
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> removeMoves = new ArrayList<>();
-        try{
-            ChessBoard copyBoard = board.clone();
-            for (ChessMove illegalMove : moves){
-                board = copyBoard.clone();
-                forceMove(illegalMove);
-                if(isInCheck(team))
-                    removeMoves.add(illegalMove);
-            }
-            board = copyBoard.clone();
+
+        ChessBoard copyBoard = board.copy();
+        for (ChessMove illegalMove : moves){
+            board = copyBoard.copy();
+            forceMove(illegalMove);
+            if(isInCheck(team))
+                removeMoves.add(illegalMove);
         }
-        catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        board = copyBoard.copy();
         moves.removeAll(removeMoves);
         return moves;
     }
@@ -84,7 +80,7 @@ public class ChessGame {
         }
         else {
             board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
-                    move.getPromotionPiece()));
+            move.getPromotionPiece()));
             board.addPiece(move.getStartPosition(), null);
         }
     }
@@ -136,11 +132,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        try {
-            if (isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves(teamColor))) return true;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        if (isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves(teamColor))) return true;
         return false;
     }
 
@@ -153,12 +145,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         Collection<ChessMove> teamMoves = teamMoves(teamColor);
-        try {
-            return !isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves);
-        }
-        catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        return !isInCheck(teamColor) && !escapeCheck(teamColor, teamMoves);
     }
 
     /**
@@ -167,13 +154,17 @@ public class ChessGame {
      * @param teamMoves moves of this team
      * @return true if making the move no longer puts you in check, false if it keeps you in check
      */
-    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves) throws CloneNotSupportedException {
-        ChessBoard copyBoard = board.clone();
+    public boolean escapeCheck(TeamColor teamColor, Collection<ChessMove> teamMoves){
+        ChessBoard copyBoard = board.copy();
         for (ChessMove move : teamMoves){
-            board = copyBoard.clone();
+            board = copyBoard.copy();
             forceMove(move);
-            if (!isInCheck(teamColor)) return true;
+            if (!isInCheck(teamColor)){
+                board = copyBoard.copy();
+                return true;
+            }
         }
+        board = copyBoard.copy();
         return false;
     }
 
@@ -211,9 +202,6 @@ public class ChessGame {
 
     /**
      * Find any piece on the board
-     *
-     * @param teamColor
-     * @param piece
      */
     PieceFinder finder = (teamColor, pieceType) -> {
         for (int r = 1; r <= 8; r++){

@@ -98,7 +98,6 @@ public class ChessBoard implements Cloneable{
                     ChessPosition pos = new ChessPosition(i + 1, j + 1);
                     boardToString += String.format("%s = [%s]\n", board[i][j], pos);
                 }
-
             }
         }
         return boardToString;
@@ -117,15 +116,12 @@ public class ChessBoard implements Cloneable{
         return Arrays.deepHashCode(board);
     }
 
-    @Override
-    protected ChessBoard clone() throws CloneNotSupportedException {
+    public ChessBoard copy() {
         ChessBoard cloneBoard = new ChessBoard();
-        cloneBoard.board = new ChessPiece[8][8];
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                if (this.board[i][j] != null){
-                    cloneBoard.board[i][j] = this.board[i][j].clone();
-                }
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                ChessPosition pos = new ChessPosition(i, j);
+                cloneBoard.addPiece(pos, getPiece(pos));
             }
         }
         return cloneBoard;
