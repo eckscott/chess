@@ -16,6 +16,7 @@ public class Server {
         // Register your endpoints and exception handlers here.
         server.delete("db", ctx -> ctx.result("{}"));
         server.post("user", ctx -> register(ctx));
+        server.post("session", ctx -> login(ctx));
 
     }
 
@@ -27,6 +28,17 @@ public class Server {
         // cal to the service and register
 
         var response = Map.of("username", req.get("username"), "authToken", "yzx");
+        ctx.result(serializer.toJson(response));
+    }
+
+    private void login(Context ctx){
+        var serializer = new Gson();
+        String requestJson = ctx.body();
+        var req = serializer.fromJson(requestJson, Map.class);
+
+        // call to the service and login
+
+        var response = Map.of("username:", req.get("username"), "authToken", "abc");
         ctx.result(serializer.toJson(response));
     }
 
