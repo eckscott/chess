@@ -14,9 +14,10 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws Exception {
-        if (dataAccess.getUser(user.username()) != null){
+        if (dataAccess.getUser(user.username()) != null)
             throw new Exception("already exists");
-        }
+        if (dataAccess.getUser(user.password()) == null)
+            throw new Exception("tried to register without password");
 
         dataAccess.createUser(user);
 
