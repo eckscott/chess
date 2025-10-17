@@ -1,14 +1,15 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
 import datamodel.*;
 
 public class UserService {
 
 
-    private final DataAccess dataAccess;
+    private final MemoryDataAccess dataAccess;
 
-    public UserService(DataAccess dataAccess){
+    public UserService(MemoryDataAccess dataAccess){
         this.dataAccess = dataAccess;
     }
 
@@ -18,9 +19,15 @@ public class UserService {
         }
 
         dataAccess.createUser(user);
-        var authData = new AuthData(user.username(), generateAuthToken());
 
-        return authData;
+        return new AuthData(user.username(), generateAuthToken());
+    }
+
+    public AuthData login(UserData loginCreds) throws Exception{
+        if (dataAccess.getUser(loginCreds.username()) == null)
+            throw new Exception("User does not exist");
+
+        return new AuthData(loginCreds.username(), generateAuthToken());
     }
 
     private String generateAuthToken(){

@@ -46,14 +46,20 @@ public class Server {
     }
 
     private void login(Context ctx){
-        var serializer = new Gson();
-        String requestJson = ctx.body();
-        var req = serializer.fromJson(requestJson, Map.class);
+        try{
+            var serializer = new Gson();
+            String requestJson = ctx.body();
+            UserData loginRequest = serializer.fromJson(requestJson, UserData.class);
 
-        // call to the service and login
+            // call to the service and login
+            AuthData loginData = userService.login(loginRequest);
 
-        var response = Map.of("username:", req.get("username"), "authToken", "abc");
-        ctx.result(serializer.toJson(response));
+            ctx.result(serializer.toJson(loginData));
+        }
+        catch (Exception ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(400).result(msg);
+        }
     }
 
     public int run(int desiredPort) {

@@ -22,4 +22,9 @@ public class MemoryDataAccess implements DataAccess {
     public UserData getUser(String username) {
         return users.get(username);
     }
+
+    @Override
+    public UserData getPass(String password){
+        return users.get(password);
+    }
 }
