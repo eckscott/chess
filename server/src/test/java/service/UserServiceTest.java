@@ -24,10 +24,16 @@ class UserServiceTest {
     @Test
     @DisplayName("Good login")
     void login() throws Exception {
+        // register
         var db = new MemoryDataAccess();
-        var user = new UserData("joe", null, "123");
+        var user = new UserData("joe", "j@j.com", "123");
         var service = new UserService(db);
-        var authData = service.login(user);
-        assertNotNull(authData);
+        var authData = service.register(user);
+
+        // login
+        var loginCreds = new UserData("joe", null, "123");
+        var newAuth = service.login(loginCreds);
+        assertNotNull(newAuth);
+        assertEquals(authData.username(), newAuth.username());
     }
 }

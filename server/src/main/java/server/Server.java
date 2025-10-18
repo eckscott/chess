@@ -24,7 +24,7 @@ public class Server {
         server.delete("db", ctx -> ctx.result("{}"));
         server.post("user", ctx -> register(ctx));
         server.post("session", ctx -> login(ctx));
-        server.delete("session", ctx -> ctx.result("{}"));
+        server.delete("session", ctx -> logout(ctx));
 
     }
 
@@ -59,6 +59,22 @@ public class Server {
         catch (Exception ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(400).result(msg);
+        }
+    }
+
+    private void logout(Context ctx){
+        try{
+            String token = ctx.header("Authorization");
+            AuthData logoutRequest = new AuthData(null, token);
+
+            // call to the service and register
+            userService.logout(logoutRequest);
+
+            ctx.result("{}");
+        }
+        catch (Exception ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(403).result(msg);
         }
     }
 

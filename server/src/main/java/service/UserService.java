@@ -4,6 +4,8 @@ import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import datamodel.*;
 
+import java.util.UUID;
+
 public class UserService {
 
 
@@ -28,10 +30,19 @@ public class UserService {
         if (dataAccess.getUser(loginCreds.username()) == null)
             throw new Exception("User does not exist");
 
-        return new AuthData(loginCreds.username(), generateAuthToken());
+        String authToken = generateAuthToken();
+        dataAccess.createAuth(new AuthData(loginCreds.username(), authToken));
+        return new AuthData(loginCreds.username(), authToken);
+    }
+
+    public void logout(AuthData logoutRequest) throws Exception{
+        if (logoutRequest.authToken() == null)
+            throw new Exception("Not authorized");
+
+        dataAccess.deleteAuth(logoutRequest);
     }
 
     private String generateAuthToken(){
-        return "xyz";
+        return UUID.randomUUID().toString();
     }
 }
