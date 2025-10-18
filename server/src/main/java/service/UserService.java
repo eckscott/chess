@@ -17,14 +17,16 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws Exception {
-        if (dataAccess.getUser(user.username()) != null)
-            throw new Exception("Error: already taken");
         if (user.password() == null || user.username() == null || user.email() == null)
             throw new BadRequestException("Error: bad request");
+        if (dataAccess.getUser(user.username()) != null)
+            throw new Exception("Error: already taken");
 
         dataAccess.createUser(user);
+        var auth = new AuthData(user.username(), generateAuthToken());
+        dataAccess.createAuth(auth);
 
-        return new AuthData(user.username(), generateAuthToken());
+        return auth;
     }
 
     public AuthData login(UserData loginCreds) throws Exception {
