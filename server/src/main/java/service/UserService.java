@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import datamodel.*;
 
@@ -17,29 +18,34 @@ public class UserService {
 
     public AuthData register(UserData user) throws Exception {
         if (dataAccess.getUser(user.username()) != null)
-            throw new Exception("already exists");
+            throw new Exception("Error: already taken");
         if (user.password() == null || user.username() == null || user.email() == null)
-            throw new Exception("Not enough fields");
+            throw new BadRequestException("Error: bad request");
 
         dataAccess.createUser(user);
 
         return new AuthData(user.username(), generateAuthToken());
     }
 
-    public AuthData login(UserData loginCreds) throws Exception{
-        if (dataAccess.getUser(loginCreds.username()) == null)
-            throw new Exception("User does not exist");
+    public AuthData login(UserData loginCreds) throws Exception {
+        if (loginCreds.username() == null || loginCreds.password() == null)
+            throw new BadRequestException("Error: bad request");
+        if (dataAccess.getUser(loginCreds.username()) == null ||
+            dataAccess.getUser(loginCreds.username()).password() == null ||
+            !dataAccess.getUser(loginCreds.username()).password().equals(loginCreds.password()))
+            throw new UnauthorizedException("Error: unauthorized");
 
         String authToken = generateAuthToken();
         dataAccess.createAuth(new AuthData(loginCreds.username(), authToken));
         return new AuthData(loginCreds.username(), authToken);
     }
 
-    public void logout(AuthData logoutRequest) throws Exception{
-        if (logoutRequest.authToken() == null)
-            throw new Exception("Not authorized");
-
-        dataAccess.deleteAuth(logoutRequest);
+    public void logout(AuthData logoutRequest){
+        try {
+            dataAccess.deleteAuth(logoutRequest);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String generateAuthToken(){

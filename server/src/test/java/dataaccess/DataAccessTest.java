@@ -1,5 +1,6 @@
 package dataaccess;
 
+import datamodel.AuthData;
 import datamodel.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,10 @@ class DataAccessTest {
     }
 
     @Test
-    void getUser() {
+    void createAuth() {
+        DataAccess db = new MemoryDataAccess();
+        var auth = new AuthData("joe", "xyz");
+        db.createAuth(auth);
+        assertEquals(auth.authToken(), db.getAuth(auth.authToken()));
     }
 }

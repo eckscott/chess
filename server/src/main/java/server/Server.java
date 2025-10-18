@@ -6,6 +6,8 @@ import datamodel.AuthData;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.BadRequestException;
+import service.UnauthorizedException;
 import service.UserService;
 
 import java.util.Map;
@@ -38,8 +40,10 @@ public class Server {
             AuthData authData = userService.register(userRequest);
 
             ctx.result(serializer.toJson(authData));
-        }
-        catch (Exception ex){
+        } catch (BadRequestException ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(400).result(msg);
+        } catch (Exception ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(403).result(msg);
         }
@@ -56,9 +60,17 @@ public class Server {
 
             ctx.result(serializer.toJson(loginData));
         }
-        catch (Exception ex){
+        catch (BadRequestException ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(400).result(msg);
+        }
+        catch (UnauthorizedException ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(401).result(msg);
+        }
+        catch (Exception ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(500).result(msg);
         }
     }
 
@@ -71,6 +83,10 @@ public class Server {
             userService.logout(logoutRequest);
 
             ctx.result("{}");
+        }
+        catch (RuntimeException ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(401).result(msg);
         }
         catch (Exception ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());

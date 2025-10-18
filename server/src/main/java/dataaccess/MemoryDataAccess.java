@@ -3,6 +3,7 @@ package dataaccess;
 import datamodel.AuthData;
 import datamodel.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 
 public class MemoryDataAccess implements DataAccess {
@@ -34,11 +35,15 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public String getAuth(String authToken){
-        return auth.get(authToken);
+        if (auth.get(authToken) != null)
+            return authToken;
+        return null;
     }
 
     @Override
-    public void deleteAuth(AuthData authorization){
+    public void deleteAuth(AuthData authorization) throws DataAccessException{
+        if (auth.get(authorization.authToken()) == null)
+            throw new DataAccessException("Error: unauthorized");
         auth.remove(authorization.authToken());
     }
 }
