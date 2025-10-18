@@ -1,15 +1,19 @@
 package dataaccess;
 
 import datamodel.AuthData;
+import datamodel.GameData;
 import datamodel.UserData;
 
 import javax.xml.crypto.Data;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryDataAccess implements DataAccess {
 
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<String, String> auth = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
     public void clear() {
@@ -41,9 +45,14 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(AuthData authorization) throws DataAccessException{
-        if (auth.get(authorization.authToken()) == null)
+    public void deleteAuth(String authToken) throws DataAccessException{
+        if (auth.get(authToken) == null)
             throw new DataAccessException("Error: unauthorized");
-        auth.remove(authorization.authToken());
+        auth.remove(authToken);
+    }
+
+    @Override
+    public Collection<GameData> listGames() {
+        return games.values();
     }
 }

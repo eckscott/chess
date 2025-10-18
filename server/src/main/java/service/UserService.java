@@ -42,9 +42,9 @@ public class UserService {
         return new AuthData(loginCreds.username(), authToken);
     }
 
-    public void logout(AuthData logoutRequest){
+    public void logout(String authToken){
         try {
-            dataAccess.deleteAuth(logoutRequest);
+            dataAccess.deleteAuth(authToken);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

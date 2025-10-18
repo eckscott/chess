@@ -2,31 +2,39 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
-import datamodel.AuthData;
-import datamodel.UserData;
+import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.BadRequestException;
+import service.GameService;
 import service.UnauthorizedException;
 import service.UserService;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class Server {
 
     private final Javalin server;
     private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // Register your endpoints and exception handlers here.
+        // clear
         server.delete("db", ctx -> ctx.result("{}"));
+
+        // users
         server.post("user", ctx -> register(ctx));
         server.post("session", ctx -> login(ctx));
         server.delete("session", ctx -> logout(ctx));
+
+        // games
+        server.get("game", ctx -> listGames(ctx));
 
     }
 
@@ -77,10 +85,9 @@ public class Server {
     private void logout(Context ctx){
         try{
             String token = ctx.header("Authorization");
-            AuthData logoutRequest = new AuthData(null, token);
 
             // call to the service and register
-            userService.logout(logoutRequest);
+            userService.logout(token);
 
             ctx.result("{}");
         }
@@ -90,7 +97,19 @@ public class Server {
         }
         catch (Exception ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
-            ctx.status(403).result(msg);
+            ctx.status(500).result(msg);
+        }
+    }
+
+    private void listGames(Context ctx){
+        try {
+            var serializer = new Gson();
+            String token = ctx.header("Authorization");
+            Collection<GameData> games = gameService.listGames(token);
+
+            ctx.result(serializer.toJson(games));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
