@@ -5,13 +5,14 @@ import dataaccess.MemoryDataAccess;
 import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import model.ListGamesResponse;
 import service.BadRequestException;
 import service.GameService;
 import service.UnauthorizedException;
 import service.UserService;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 public class Server {
 
@@ -34,8 +35,9 @@ public class Server {
         server.delete("session", ctx -> logout(ctx));
 
         // games
+        server.post("game", ctx -> createGame(ctx));
         server.get("game", ctx -> listGames(ctx));
-
+        server.put("game", ctx -> joinGame(ctx));
     }
 
     private void register(Context ctx){
@@ -101,14 +103,55 @@ public class Server {
         }
     }
 
+    private void createGame(Context ctx){
+        try {
+            var serializer = new Gson();
+            String token = ctx.header("Authorization");
+            String requestJson = ctx.body();
+            GameData gameRequest = serializer.fromJson(requestJson, GameData.class);
+
+            GameData createGameResult = gameService.createGame(token, gameRequest);
+            ctx.result(serializer.toJson(createGameResult));
+        }
+        catch (BadRequestException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(400).result(msg);
+        }
+        catch (UnauthorizedException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(401).result(msg);
+        }
+    }
+
     private void listGames(Context ctx){
         try {
             var serializer = new Gson();
             String token = ctx.header("Authorization");
             Collection<GameData> games = gameService.listGames(token);
 
-            ctx.result(serializer.toJson(games));
+            //ctx.result(serializer.toJson(games));
+            ctx.result(serializer.toJson(new ListGamesResponse(new ArrayList<>())));
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void joinGame(Context ctx){
+        try {
+            var serializer = new Gson();
+            String token = ctx.header("Authorization");
+            String requestJson = ctx.body();
+            JoinGameData joinGameRequest = serializer.fromJson(requestJson, JoinGameData.class);
+
+            gameService.joinGame(token, joinGameRequest);
+
+            //ctx.result("{}");
+        }
+        catch (RuntimeException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(401).result(msg);
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,10 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import datamodel.AuthData;
 import datamodel.GameData;
+import datamodel.JoinGameData;
 import datamodel.UserData;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,7 +53,49 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
+    public void createGame(GameData gameData){
+        games.put(gameData.gameID(), gameData);
+    }
+
+    @Override
+    public GameData getGame(int gameID){
+        return games.get(gameID);
+    }
+
+    @Override
     public Collection<GameData> listGames() {
+        if (games.isEmpty())
+            return new ArrayList<>();
         return games.values();
+    }
+
+    @Override
+    public void joinGame(String authToken, JoinGameData joinGameReq) throws DataAccessException {
+        if (joinGameReq.playerColor() == ChessGame.TeamColor.WHITE){
+            if (games.containsKey(joinGameReq.gameID())){
+                if (games.get(joinGameReq.gameID()).whiteUsername() != null)
+                    throw new DataAccessException("Error: White team already taken");
+                var newGame = new GameData(joinGameReq.gameID(), auth.get(authToken),
+                                           games.get(joinGameReq.gameID()).blackUsername(),
+                                           games.get(joinGameReq.gameID()).gameName(),
+                                           games.get(joinGameReq.gameID()).game());
+                games.put(joinGameReq.gameID(), newGame);
+            }
+            else
+                throw new DataAccessException("Error: game does not exist");
+        }
+        if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
+            if (games.containsKey(joinGameReq.gameID())){
+                if (games.get(joinGameReq.gameID()).blackUsername() != null)
+                    throw new DataAccessException("Error: black team already taken");
+                var newGame = new GameData(joinGameReq.gameID(), games.get(joinGameReq.gameID()).whiteUsername(),
+                                           auth.get(authToken),
+                                           games.get(joinGameReq.gameID()).gameName(),
+                                           games.get(joinGameReq.gameID()).game());
+                                           games.put(joinGameReq.gameID(), newGame);
+            }
+            else
+                throw new DataAccessException("Error: game does not exist");
+        }
     }
 }
