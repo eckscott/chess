@@ -62,8 +62,6 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public Collection<GameData> listGames() {
-        //if (games.isEmpty())
-            //return new ArrayList<>();
         return games.values();
     }
 

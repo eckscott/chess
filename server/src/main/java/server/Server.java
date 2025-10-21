@@ -131,7 +131,8 @@ public class Server {
 
             ctx.result(serializer.toJson(games));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(401).result(msg);
         }
     }
 
