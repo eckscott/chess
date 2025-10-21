@@ -146,12 +146,17 @@ public class Server {
 
             //ctx.result("{}");
         }
-        catch (RuntimeException e) {
+        catch (BadRequestException e){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(400).result(msg);
+        }
+        catch (UnauthorizedException e){
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(401).result(msg);
         }
-        catch (Exception e) {
-            throw new RuntimeException(e);
+        catch (RuntimeException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(403).result(msg);
         }
     }
 

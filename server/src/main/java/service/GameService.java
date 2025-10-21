@@ -39,10 +39,10 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameData joinGameReq){
-        if (authToken == null || dataAccess.getAuth(authToken) == null)
-            throw new UnauthorizedException("Error: unauthorized");
         if (joinGameReq.gameID() <= 0 || joinGameReq.playerColor() == null)
             throw new BadRequestException("Error: bad request");
+        if (authToken == null || dataAccess.getAuth(authToken) == null)
+            throw new UnauthorizedException("Error: unauthorized");
 
         try{
             dataAccess.joinGame(authToken, joinGameReq);
