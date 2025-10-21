@@ -3,7 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import datamodel.*;
+import model.*;
 
 import java.util.UUID;
 
@@ -14,6 +14,10 @@ public class UserService {
 
     public UserService(MemoryDataAccess dataAccess){
         this.dataAccess = dataAccess;
+    }
+
+    public void clear(){
+        dataAccess.clear();
     }
 
     public AuthData register(UserData user) throws Exception {

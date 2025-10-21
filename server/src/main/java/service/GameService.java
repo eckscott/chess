@@ -2,8 +2,9 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import datamodel.GameData;
-import datamodel.JoinGameData;
+import model.GameData;
+import model.JoinGameData;
+import model.ListGamesResponse;
 
 import java.util.Collection;
 import java.util.Random;
@@ -29,11 +30,12 @@ public class GameService {
         return createGameData;
     }
 
-    public Collection<GameData> listGames(String authToken) throws Exception {
+    public ListGamesResponse listGames(String authToken) throws Exception {
         if (authToken == null || dataAccess.getAuth(authToken) == null)
             throw new UnauthorizedException("Error: unauthorized");
 
-        return dataAccess.listGames();
+        Collection<GameData> gamesList = dataAccess.listGames();
+        return new ListGamesResponse(gamesList);
     }
 
     public void joinGame(String authToken, JoinGameData joinGameReq){

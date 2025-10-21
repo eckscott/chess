@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
-import datamodel.UserData;
+import model.UserData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

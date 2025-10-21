@@ -1,10 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
-import datamodel.AuthData;
-import datamodel.GameData;
-import datamodel.JoinGameData;
-import datamodel.UserData;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +17,7 @@ public class MemoryDataAccess implements DataAccess {
     public void clear() {
         users.clear();
         auth.clear();
+        games.clear();
     }
 
     @Override
@@ -64,8 +62,8 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public Collection<GameData> listGames() {
-        if (games.isEmpty())
-            return new ArrayList<>();
+        //if (games.isEmpty())
+            //return new ArrayList<>();
         return games.values();
     }
 

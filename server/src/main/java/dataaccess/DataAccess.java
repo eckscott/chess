@@ -1,6 +1,6 @@
 package dataaccess;
 
-import datamodel.*;
+import model.*;
 
 import java.util.Collection;
 

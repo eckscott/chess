@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
-import datamodel.*;
+import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.ListGamesResponse;
@@ -27,7 +27,7 @@ public class Server {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // clear
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", ctx -> {userService.clear(); ctx.result("{}");});
 
         // users
         server.post("user", ctx -> register(ctx));
@@ -127,10 +127,9 @@ public class Server {
         try {
             var serializer = new Gson();
             String token = ctx.header("Authorization");
-            Collection<GameData> games = gameService.listGames(token);
+            ListGamesResponse games = gameService.listGames(token);
 
-            //ctx.result(serializer.toJson(games));
-            ctx.result(serializer.toJson(new ListGamesResponse(new ArrayList<>())));
+            ctx.result(serializer.toJson(games));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
