@@ -34,6 +34,15 @@ class GameServiceTest {
     }
 
     @Test
+    @DisplayName("Clear")
+    void clear() throws Exception{
+        existingGameData = service.createGame(auth.authToken(), createGameData);
+        userService.clear();
+        assertNull(db.getUser("joe"));
+        assertNull(db.getGame(existingGameData.gameID()));
+    }
+
+    @Test
     @DisplayName("Good Create Game")
     void createGame() {
         existingGameData = service.createGame(auth.authToken(), createGameData);
@@ -56,7 +65,7 @@ class GameServiceTest {
         Collection<GameData> games = new ArrayList<>();
         games.add(existingGameData);
         var response = service.listGames(auth.authToken());
-        var compResponse = new ListGamesResponse(games);
+        var compResponse = new ListGamesResponse(db.listGames());
 
         assertEquals(compResponse, response);
     }
