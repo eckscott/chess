@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
+import service.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,9 +45,9 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException{
+    public void deleteAuth(String authToken) throws UnauthorizedException{
         if (auth.get(authToken) == null)
-            throw new DataAccessException("Error: unauthorized");
+            throw new UnauthorizedException("unauthorized");
         auth.remove(authToken);
     }
 

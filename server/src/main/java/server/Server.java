@@ -93,7 +93,7 @@ public class Server {
 
             ctx.result("{}");
         }
-        catch (RuntimeException ex){
+        catch (UnauthorizedException ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(401).result(msg);
         }
