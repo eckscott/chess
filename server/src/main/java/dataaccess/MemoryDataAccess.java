@@ -71,7 +71,7 @@ public class MemoryDataAccess implements DataAccess {
         if (joinGameReq.playerColor() == ChessGame.TeamColor.WHITE){
             if (games.containsKey(joinGameReq.gameID())) {
                 if (games.get(joinGameReq.gameID()).whiteUsername() != null) {
-                    throw new Exception("Error: White team already taken");
+                    throw new Exception("already taken");
                 }
                 var newGame = new GameData(joinGameReq.gameID(), auth.get(authToken),
                         games.get(joinGameReq.gameID()).blackUsername(),
@@ -79,13 +79,13 @@ public class MemoryDataAccess implements DataAccess {
                         games.get(joinGameReq.gameID()).game());
                 games.put(joinGameReq.gameID(), newGame);
             } else {
-                throw new DataAccessException("Error: game does not exist");
+                throw new DataAccessException("game does not exist");
             }
         }
         if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
             if (games.containsKey(joinGameReq.gameID())) {
                 if (games.get(joinGameReq.gameID()).blackUsername() != null) {
-                    throw new Exception("Error: black team already taken");
+                    throw new Exception("already taken");
                 }
                 var newGame = new GameData(joinGameReq.gameID(), games.get(joinGameReq.gameID()).whiteUsername(),
                         auth.get(authToken),
@@ -93,7 +93,7 @@ public class MemoryDataAccess implements DataAccess {
                         games.get(joinGameReq.gameID()).game());
                 games.put(joinGameReq.gameID(), newGame);
             } else {
-                throw new Exception("Error: game does not exist");
+                throw new Exception("game does not exist");
             }
         }
     }
