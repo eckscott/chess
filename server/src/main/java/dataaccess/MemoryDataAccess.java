@@ -4,7 +4,6 @@ import chess.ChessGame;
 import model.*;
 import service.UnauthorizedException;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -45,9 +44,10 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) throws UnauthorizedException{
-        if (auth.get(authToken) == null)
+    public void deleteAuth(String authToken) {
+        if (auth.get(authToken) == null) {
             throw new UnauthorizedException("unauthorized");
+        }
         auth.remove(authToken);
     }
 
@@ -67,32 +67,34 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void joinGame(String authToken, JoinGameData joinGameReq) throws DataAccessException {
+    public void joinGame(String authToken, JoinGameData joinGameReq) throws Exception {
         if (joinGameReq.playerColor() == ChessGame.TeamColor.WHITE){
-            if (games.containsKey(joinGameReq.gameID())){
-                if (games.get(joinGameReq.gameID()).whiteUsername() != null)
-                    throw new DataAccessException("Error: White team already taken");
+            if (games.containsKey(joinGameReq.gameID())) {
+                if (games.get(joinGameReq.gameID()).whiteUsername() != null) {
+                    throw new Exception("Error: White team already taken");
+                }
                 var newGame = new GameData(joinGameReq.gameID(), auth.get(authToken),
-                                           games.get(joinGameReq.gameID()).blackUsername(),
-                                           games.get(joinGameReq.gameID()).gameName(),
-                                           games.get(joinGameReq.gameID()).game());
+                        games.get(joinGameReq.gameID()).blackUsername(),
+                        games.get(joinGameReq.gameID()).gameName(),
+                        games.get(joinGameReq.gameID()).game());
                 games.put(joinGameReq.gameID(), newGame);
-            }
-            else
+            } else {
                 throw new DataAccessException("Error: game does not exist");
+            }
         }
         if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
-            if (games.containsKey(joinGameReq.gameID())){
-                if (games.get(joinGameReq.gameID()).blackUsername() != null)
-                    throw new DataAccessException("Error: black team already taken");
+            if (games.containsKey(joinGameReq.gameID())) {
+                if (games.get(joinGameReq.gameID()).blackUsername() != null) {
+                    throw new Exception("Error: black team already taken");
+                }
                 var newGame = new GameData(joinGameReq.gameID(), games.get(joinGameReq.gameID()).whiteUsername(),
-                                           auth.get(authToken),
-                                           games.get(joinGameReq.gameID()).gameName(),
-                                           games.get(joinGameReq.gameID()).game());
-                                           games.put(joinGameReq.gameID(), newGame);
+                        auth.get(authToken),
+                        games.get(joinGameReq.gameID()).gameName(),
+                        games.get(joinGameReq.gameID()).game());
+                games.put(joinGameReq.gameID(), newGame);
+            } else {
+                throw new Exception("Error: game does not exist");
             }
-            else
-                throw new DataAccessException("Error: game does not exist");
         }
     }
 }

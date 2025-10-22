@@ -145,7 +145,7 @@ public class Server {
 
             gameService.joinGame(token, joinGameRequest);
 
-            //ctx.result("{}");
+            ctx.result("{}");
         }
         catch (BadRequestException e){
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
@@ -156,6 +156,10 @@ public class Server {
             ctx.status(401).result(msg);
         }
         catch (RuntimeException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(500).result(msg);
+        }
+        catch (Exception e) {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(403).result(msg);
         }

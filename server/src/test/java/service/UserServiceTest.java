@@ -35,7 +35,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Good registration")
-    void register() throws Exception {
+    void register(){
         assertNotNull(authData);
         assertEquals(user.username(), authData.username());
         assertTrue(!authData.authToken().isEmpty());
@@ -70,7 +70,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Good logout")
-    void logout() throws Exception{
+    void logout(){
         service.logout(authData.authToken());
         assertNull(db.getAuth(authData.authToken()));
     }

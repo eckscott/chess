@@ -10,9 +10,9 @@ public interface DataAccess {
     UserData getUser(String username);
     void createAuth(AuthData authorization);
     String getAuth(String authToken);
-    void deleteAuth(String authToken) throws DataAccessException;
+    void deleteAuth(String authToken) throws Exception;
     void createGame(GameData gameData);
     GameData getGame(int gameID);
     Collection<GameData> listGames();
-    void joinGame(String authToken, JoinGameData joinGameReq) throws DataAccessException;
+    void joinGame(String authToken, JoinGameData joinGameReq) throws Exception;
 }

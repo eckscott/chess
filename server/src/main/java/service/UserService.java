@@ -1,7 +1,5 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
 
@@ -46,7 +44,7 @@ public class UserService {
         return new AuthData(loginCreds.username(), authToken);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws UnauthorizedException{
         dataAccess.deleteAuth(authToken);
     }
 
