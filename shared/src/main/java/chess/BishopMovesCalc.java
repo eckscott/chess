@@ -5,39 +5,37 @@ import java.util.Collection;
 
 public class BishopMovesCalc implements PieceMovesCalc {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece currPiece = board.getPiece(myPosition);
 
         int[] directions = {-1, 1};
-        for (int i = 0; i < directions.length; i++) {
-            for (int j = 0; j < directions.length; j++){
+        for(int i = 0; i < directions.length; i++){
+            for(int j = 0; j < directions.length; j++){
                 int r = myPosition.getRow();
                 int c = myPosition.getColumn();
-                while (true) {
+                while (true){
                     r = r + directions[i];
                     c = c + directions[j];
 
-                    if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                    if (r > 8 || r < 1 || c > 8 || c < 1) {
                         break;
+                    }
 
                     ChessPosition newPosition = new ChessPosition(r, c);
-                    if (board.getPiece(newPosition) == null)
+                    if (board.getPiece(newPosition) == null) {
                         moves.add(new ChessMove(myPosition, newPosition, null));
-                    else{
-                        ChessPiece newPositionPiece = board.getPiece(newPosition);
-                        if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
-                            moves.add(new ChessMove(myPosition, newPosition, null));
-                            break;
-                        }
-                        else
-                            break;
+                    }
+                    else if (board.getPiece(newPosition).getTeamColor() != currPiece.getTeamColor()){
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                        break;
+                    }
+                    else {
+                        break;
                     }
                 }
             }
         }
-
         return moves;
     }
-
 }
