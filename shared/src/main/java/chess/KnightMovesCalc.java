@@ -20,8 +20,9 @@ public class KnightMovesCalc implements PieceMovesCalc {
                 ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowDirections[i],
                                                                myPosition.getColumn() + colDirections[i]);
 
-                if (board.getPiece(newPosition) == null)
+                if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
+                }
                 else {
                     ChessPiece newPositionPiece = board.getPiece(newPosition);
                     if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){

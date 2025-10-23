@@ -38,8 +38,9 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public String getAuth(String authToken){
-        if (auth.get(authToken) != null)
+        if (auth.get(authToken) != null) {
             return authToken;
+        }
         return null;
     }
 

@@ -10,12 +10,12 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private final int ROW;
-    private final int COL;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
-        this.ROW = row;
-        this.COL = col;
+        this.row = row;
+        this.col = col;
     }
 
 
@@ -24,7 +24,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return ROW;
+        return row;
     }
 
     /**
@@ -32,23 +32,23 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return COL;
+        return col;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d, %d]", ROW, COL);
+        return String.format("[%d, %d]", row, col);
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof ChessPosition pos &&
-               (pos.ROW == ROW) &&
-               (pos.COL == COL);
+               (pos.row == row) &&
+               (pos.col == col);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ROW, COL);
+        return Objects.hash(row, col);
     }
 }

@@ -18,20 +18,23 @@ public class RookMovesCalc implements PieceMovesCalc{
                 r = r + rowDirections[i];
                 c = c + colDirections[i];
 
-                if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL)
+                if (r > MAX_ROW || r < MIN_ROW || c > MAX_COL || c < MIN_COL) {
                     break;
+                }
 
                 ChessPosition newPosition = new ChessPosition(r, c);
-                if (board.getPiece(newPosition) == null)
+                if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
+                }
                 else{
                     ChessPiece newPositionPiece = board.getPiece(newPosition);
                     if (currPiece.getTeamColor() != newPositionPiece.getTeamColor()){
                         moves.add(new ChessMove(myPosition, newPosition, null));
                         break;
                     }
-                    else
+                    else {
                         break;
+                    }
                 }
             }
         }

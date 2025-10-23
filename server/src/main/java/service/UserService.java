@@ -19,10 +19,12 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws Exception {
-        if (user.password() == null || user.username() == null || user.email() == null)
+        if (user.password() == null || user.username() == null || user.email() == null) {
             throw new BadRequestException("bad request");
-        if (dataAccess.getUser(user.username()) != null)
+        }
+        if (dataAccess.getUser(user.username()) != null) {
             throw new Exception("already taken");
+        }
 
         dataAccess.createUser(user);
         var auth = new AuthData(user.username(), generateAuthToken());
@@ -32,12 +34,14 @@ public class UserService {
     }
 
     public AuthData login(UserData loginCreds) throws Exception {
-        if (loginCreds.username() == null || loginCreds.password() == null)
+        if (loginCreds.username() == null || loginCreds.password() == null) {
             throw new BadRequestException("bad request");
+        }
         if (dataAccess.getUser(loginCreds.username()) == null ||
             dataAccess.getUser(loginCreds.username()).password() == null ||
-            !dataAccess.getUser(loginCreds.username()).password().equals(loginCreds.password()))
+            !dataAccess.getUser(loginCreds.username()).password().equals(loginCreds.password())) {
             throw new UnauthorizedException("unauthorized");
+        }
 
         String authToken = generateAuthToken();
         dataAccess.createAuth(new AuthData(loginCreds.username(), authToken));
