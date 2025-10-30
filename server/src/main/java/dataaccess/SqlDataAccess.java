@@ -6,14 +6,17 @@ import model.*;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
+import dataaccess.SqlHelperMethods;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class SqlDataAccess implements DataAccess{
 
+    private static final SqlHelperMethods helper = new SqlHelperMethods();
+
     public SqlDataAccess() throws DataAccessException{
-        configureDatabase();
+        helper.configureDatabase();
     }
 
     @Override
@@ -23,13 +26,6 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void createUser(UserData user) {
-        try (var conn = DatabaseManager.getConnection()){
-            var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        }
-
-        statement.setString()
-
-
 
     }
 
@@ -73,29 +69,5 @@ public class SqlDataAccess implements DataAccess{
 
     }
 
-
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                'username' varchar(256) NOT NULL,
-                'email' varchar(256) NOT NULL,
-                'password' varchar(256) NOT NULL,
-                'json' TEXT DEFAULT NULL,
-            PRIMARY KEY ('username'))
-            """
-    };
-
-    public void configureDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }
 
