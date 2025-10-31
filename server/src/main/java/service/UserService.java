@@ -3,6 +3,7 @@ package service;
 import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ public class UserService {
         if (dataAccess.getUser(user.username()) != null) {
             throw new Exception("already taken");
         }
-
+        user.password() = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         dataAccess.createUser(user);
         var auth = new AuthData(user.username(), generateAuthToken());
         dataAccess.createAuth(auth);
