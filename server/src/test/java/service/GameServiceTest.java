@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.MemoryDataAccess;
+import dataaccess.SqlDataAccess;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,12 +20,13 @@ class GameServiceTest {
     private static GameData existingGameData;
     private static GameService service;
     private static UserService userService;
-    private static MemoryDataAccess db;
+    //private static MemoryDataAccess db;
+    private static SqlDataAccess db;
     private static AuthData auth;
 
     @BeforeEach
     public void setup() throws Exception{
-        db = new MemoryDataAccess();
+        db = new SqlDataAccess();
         userService = new UserService(db);
         service = new GameService(db);
         user = new UserData("joe", "j@jmail.com", "123");

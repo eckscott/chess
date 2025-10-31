@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.SqlDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
@@ -15,12 +16,13 @@ class UserServiceTest {
 
     private static UserData user;
     private static UserService service;
-    private static MemoryDataAccess db;
+    //private static MemoryDataAccess db;
+    private static SqlDataAccess db;
     private static AuthData authData;
 
     @BeforeEach
     public void setup() throws Exception {
-        db = new MemoryDataAccess();
+        db = new SqlDataAccess();
         user = new UserData("joe", "j@j.com", "123");
         service = new UserService(db);
         authData = service.register(user);

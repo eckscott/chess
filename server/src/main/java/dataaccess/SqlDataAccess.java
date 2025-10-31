@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.Collection;
 import java.util.List;
 import dataaccess.SqlHelperMethods;
+import service.UnauthorizedException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -21,12 +22,16 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void clear() {
-
     }
 
     @Override
     public void createUser(UserData user) {
-
+        try {
+            var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+            helper.executeUpdate(statement, user.username(), user.email(), user.password());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -45,7 +50,7 @@ public class SqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void deleteAuth(String authToken) throws Exception {
+    public void deleteAuth(String authToken) throws UnauthorizedException {
 
     }
 

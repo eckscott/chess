@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import dataaccess.SqlDataAccess;
 import model.GameData;
 import model.JoinGameData;
 import model.ListGamesResponse;
@@ -10,9 +11,10 @@ import java.util.Random;
 
 public class GameService {
 
-    private final MemoryDataAccess dataAccess;
+    //private final MemoryDataAccess dataAccess;
+    private final SqlDataAccess dataAccess;
 
-    public GameService(MemoryDataAccess dataAccess){
+    public GameService(SqlDataAccess dataAccess){
         this.dataAccess = dataAccess;
     }
 

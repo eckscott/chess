@@ -1,7 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.SqlDataAccess;
 import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -21,23 +23,29 @@ public class Server {
     private final GameService gameService;
 
     public Server() {
-        var dataAccess = new MemoryDataAccess();
-        userService = new UserService(dataAccess);
-        gameService = new GameService(dataAccess);
-        server = Javalin.create(config -> config.staticFiles.add("web"));
+        //var dataAccess = new MemoryDataAccess();
+        try {
+            var dataAccess = new SqlDataAccess();
+            userService = new UserService(dataAccess);
+            gameService = new GameService(dataAccess);
+            server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // clear
-        server.delete("db", ctx -> {userService.clear(); ctx.result("{}");});
+            // clear
+            server.delete("db", ctx -> {userService.clear(); ctx.result("{}");});
 
-        // users
-        server.post("user", ctx -> register(ctx));
-        server.post("session", ctx -> login(ctx));
-        server.delete("session", ctx -> logout(ctx));
+            // users
+            server.post("user", ctx -> register(ctx));
+            server.post("session", ctx -> login(ctx));
+            server.delete("session", ctx -> logout(ctx));
 
-        // games
-        server.post("game", ctx -> createGame(ctx));
-        server.get("game", ctx -> listGames(ctx));
-        server.put("game", ctx -> joinGame(ctx));
+            // games
+            server.post("game", ctx -> createGame(ctx));
+            server.get("game", ctx -> listGames(ctx));
+            server.put("game", ctx -> joinGame(ctx));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void register(Context ctx){
