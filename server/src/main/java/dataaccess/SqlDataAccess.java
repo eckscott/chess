@@ -23,6 +23,19 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void clear() {
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "DROP table users";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.executeUpdate();
+            }
+            var statement2 = "DROP table auth";
+            try (PreparedStatement ps = conn.prepareStatement(statement2)){
+                ps.executeUpdate();
+            }
+            helper.configureDatabase();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -68,7 +81,20 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public String getAuth(String authToken) {
-        return "";
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT username FROM auth WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setString(1, authToken);
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        return rs.getString("username");
+                    }
+                }
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     @Override
