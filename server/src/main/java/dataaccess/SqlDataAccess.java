@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.Collection;
 import java.util.List;
 import dataaccess.SqlHelperMethods;
+import org.eclipse.jetty.server.Authentication;
 import service.UnauthorizedException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -37,17 +38,20 @@ public class SqlDataAccess implements DataAccess{
     @Override
     public UserData getUser(String username) {
         try (Connection conn = DatabaseManager.getConnection()){
-            var statement = "SELECT username FROM users WHERE username=?";
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()){
                     if (rs.next()){
-                        return rs.getString("username");
+                        var user = rs.getString("username");
+                        var pass = rs.getString("password");
+                        var email = rs.getString("email");
+                        return new UserData(user, email, pass);
                     }
                 }
             }
-        } catch (SQLException e){
-
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
