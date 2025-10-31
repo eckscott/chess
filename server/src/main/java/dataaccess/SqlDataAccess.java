@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import dataaccess.SqlHelperMethods;
@@ -146,7 +147,26 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public Collection<GameData> listGames() {
-        return List.of();
+        Collection<GameData> games = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        var returnedID = rs.getInt("gameID");
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var gameName = rs.getString("gameName");
+                        var gameJson = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+                        games.add(new GameData(returnedID, whiteUsername, blackUsername, gameName, game));
+                    }
+                }
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return games;
     }
 
     @Override
@@ -159,7 +179,6 @@ public class SqlDataAccess implements DataAccess{
             var statement = "UPDATE games SET blackUsername = (?) WHERE gameID = (?)";
             helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
         }
-
     }
 
 }
