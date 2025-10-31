@@ -36,12 +36,30 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public UserData getUser(String username) {
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT username FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        return rs.getString("username");
+                    }
+                }
+            }
+        } catch (SQLException e){
+
+        }
         return null;
     }
 
     @Override
     public void createAuth(AuthData authorization) {
-
+        try{
+            var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+            helper.executeUpdate(statement, authorization.authToken(), authorization.username());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
