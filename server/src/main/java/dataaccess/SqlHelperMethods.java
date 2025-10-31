@@ -26,6 +26,16 @@ public class SqlHelperMethods {
                 username varchar(256) NOT NULL,
             PRIMARY KEY (authToken))
             """
+            ,
+            """
+            CREATE TABLE IF NOT EXISTS games (
+                gameID int NOT NULL,
+                whiteUsername varchar(256) DEFAULT NULL,
+                blackUsername varchar(256) DEFAULT NULL,
+                gameName varchar(256) NOT NULL,
+                game TEXT DEFAULT NULL,
+            PRIMARY KEY (gameID))
+            """
     };
 
     public void configureDatabase() throws DataAccessException{

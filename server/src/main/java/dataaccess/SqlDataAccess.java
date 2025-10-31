@@ -111,7 +111,12 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void createGame(GameData gameData) {
-
+        try{
+            var statement = "INSERT INTO games (gameID, gameName) VALUES (?, ?)";
+            helper.executeUpdate(statement, gameData.gameID(), gameData.gameName());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
