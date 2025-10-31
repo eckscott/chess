@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
 
@@ -121,6 +122,25 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public GameData getGame(int gameID) {
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM games WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        var returnedID = rs.getInt("gameID");
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var gameName = rs.getString("gameName");
+                        var gameJson = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+                        return new GameData(returnedID, whiteUsername, blackUsername, gameName, game);
+                    }
+                }
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
@@ -131,6 +151,14 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void joinGame(String authToken, JoinGameData joinGameReq) throws Exception {
+        if (joinGameReq.playerColor() == ChessGame.TeamColor.WHITE){
+            var statement = "UPDATE games SET whiteUsername = (?) WHERE gameID = (?)";
+            helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
+        }
+        if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
+            var statement = "UPDATE games SET blackUsername = (?) WHERE gameID = (?)";
+            helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
+        }
 
     }
 
