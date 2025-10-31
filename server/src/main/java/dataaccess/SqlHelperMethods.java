@@ -60,6 +60,7 @@ public class SqlHelperMethods {
                         ps.setNull(i + 1, NULL);
                     }
                 }
+                ps.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));

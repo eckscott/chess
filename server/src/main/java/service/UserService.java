@@ -28,8 +28,9 @@ public class UserService {
         if (dataAccess.getUser(user.username()) != null) {
             throw new Exception("already taken");
         }
-        user.password() = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        dataAccess.createUser(user);
+        String hashPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        var storedUser = new UserData(user.username(), user.email(), hashPass);
+        dataAccess.createUser(storedUser);
         var auth = new AuthData(user.username(), generateAuthToken());
         dataAccess.createAuth(auth);
 
@@ -42,7 +43,7 @@ public class UserService {
         }
         if (dataAccess.getUser(loginCreds.username()) == null ||
             dataAccess.getUser(loginCreds.username()).password() == null ||
-            !dataAccess.getUser(loginCreds.username()).password().equals(loginCreds.password())) {
+            !verifyPassword(loginCreds.username(), loginCreds.password())) {
             throw new UnauthorizedException("unauthorized");
         }
 
@@ -57,5 +58,10 @@ public class UserService {
 
     private String generateAuthToken(){
         return UUID.randomUUID().toString();
+    }
+
+    boolean verifyPassword(String username, String providedClearTextPass){
+        var storedHashedPass = dataAccess.getUser(username).password();
+        return BCrypt.checkpw(providedClearTextPass, storedHashedPass);
     }
 }
