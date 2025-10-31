@@ -2,33 +2,143 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import service.GameService;
+import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DataAccessTest {
 
+    private static SqlDataAccess db;
+    private static UserData user;
+    private static AuthData auth;
+
+    @BeforeEach
+    public void setup() throws Exception {
+        db = new SqlDataAccess();
+        user = new UserData("joe", "j@j.com", "123");
+        auth = new AuthData("joe", "xyz");
+    }
+
     @Test
     void clear() {
-        DataAccess db = new MemoryDataAccess();
-        db.createUser(new UserData("joe", "j@j.com", "123"));
+        db.createUser(user);
         db.clear();
         assertNull(db.getUser("joe"));
     }
 
     @Test
+    @DisplayName("Good createUser")
     void createUser() {
-        DataAccess db = new MemoryDataAccess();
-        var user = new UserData("joe", "j@j.com", "123");
         db.createUser(user);
         assertEquals(user, db.getUser(user.username()));
     }
 
     @Test
+    @DisplayName("Bad createUser")
+    void createBadUser() {
+
+    }
+
+    @Test
+    @DisplayName("Good getUser")
+    void getUser() {
+
+    }
+
+    @Test
+    @DisplayName("Bad getUser")
+    void getUserBad() {
+
+    }
+
+    @Test
+    @DisplayName("Good createAuth")
     void createAuth() {
-        DataAccess db = new MemoryDataAccess();
-        var auth = new AuthData("joe", "xyz");
         db.createAuth(auth);
         assertEquals(auth.authToken(), db.getAuth(auth.authToken()));
     }
+
+    @Test
+    @DisplayName("Bad createAuth -- ")
+    void createBadAuth() {
+
+    }
+
+    @Test
+    @DisplayName("Good getAuth")
+    void getAuth() {
+
+    }
+
+    @Test
+    @DisplayName("Bad getAuth -- ")
+    void getAuthBad() {
+
+    }
+
+    @Test
+    @DisplayName("Good deleteAuth")
+    void deleteAuth() {
+
+    }
+
+    @Test
+    @DisplayName("Bad deleteAuth")
+    void deleteAuthBad() {
+
+    }
+
+    @Test
+    @DisplayName("Good createGame")
+    void createGame() {
+
+    }
+
+    @Test
+    @DisplayName("Bad createGame -- ")
+    void createBadGame() {
+
+    }
+
+    @Test
+    @DisplayName("Good getGame")
+    void getGame() {
+
+    }
+
+    @Test
+    @DisplayName("Bad getGame -- ")
+    void getGameBad() {
+
+    }
+
+    @Test
+    @DisplayName("Good listGames")
+    void listGames() {
+
+    }
+
+    @Test
+    @DisplayName("Bad listGames -- ")
+    void listGamesBad() {
+
+    }
+
+    @Test
+    @DisplayName("Good joinGame")
+    void joinGame() {
+
+    }
+
+    @Test
+    @DisplayName("Bad joinGame -- ")
+    void joinGameBad() {
+
+    }
+
+
 }
