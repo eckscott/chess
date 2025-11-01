@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ class GameServiceTest {
         db = new SqlDataAccess();
         userService = new UserService(db);
         service = new GameService(db);
+        userService.clear();
         user = new UserData("joe", "j@jmail.com", "123");
         auth = userService.register(user);
 

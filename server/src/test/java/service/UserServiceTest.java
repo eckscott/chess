@@ -25,6 +25,7 @@ class UserServiceTest {
         db = new SqlDataAccess();
         user = new UserData("joe", "j@j.com", "123");
         service = new UserService(db);
+        service.clear();
         authData = service.register(user);
     }
 

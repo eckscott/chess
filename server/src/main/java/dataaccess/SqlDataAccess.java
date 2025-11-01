@@ -34,6 +34,10 @@ public class SqlDataAccess implements DataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement2)){
                 ps.executeUpdate();
             }
+            var statement3 = "DROP table games";
+            try (PreparedStatement ps = conn.prepareStatement(statement3)){
+                ps.executeUpdate();
+            }
             helper.configureDatabase();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
@@ -101,6 +105,9 @@ public class SqlDataAccess implements DataAccess{
 
     @Override
     public void deleteAuth(String authToken) throws UnauthorizedException {
+        if (getAuth(authToken) == null) {
+            throw new UnauthorizedException("unauthorized");
+        }
         try (Connection conn = DatabaseManager.getConnection()){
             try (var ps = conn.prepareStatement("DELETE FROM auth WHERE authToken=?")){
                 ps.setString(1, authToken);
@@ -152,7 +159,7 @@ public class SqlDataAccess implements DataAccess{
             var statement = "SELECT * FROM games";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
-                    if (rs.next()){
+                    while (rs.next()){
                         var returnedID = rs.getInt("gameID");
                         var whiteUsername = rs.getString("whiteUsername");
                         var blackUsername = rs.getString("blackUsername");
@@ -172,10 +179,16 @@ public class SqlDataAccess implements DataAccess{
     @Override
     public void joinGame(String authToken, JoinGameData joinGameReq) throws Exception {
         if (joinGameReq.playerColor() == ChessGame.TeamColor.WHITE){
+            if (getGame(joinGameReq.gameID()).whiteUsername() != null){
+                throw new Exception("already taken");
+            }
             var statement = "UPDATE games SET whiteUsername = (?) WHERE gameID = (?)";
             helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
         }
         if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
+            if (getGame(joinGameReq.gameID()).blackUsername() != null){
+                throw new Exception("already taken");
+            }
             var statement = "UPDATE games SET blackUsername = (?) WHERE gameID = (?)";
             helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
         }
