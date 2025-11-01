@@ -42,7 +42,6 @@ class DataAccessTest {
     @DisplayName("Bad createUser")
     void createBadUser() throws DataAccessException {
         db.createUser(user);
-        d
     }
 
     @Test
