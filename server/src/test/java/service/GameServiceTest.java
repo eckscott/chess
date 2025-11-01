@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
@@ -48,7 +49,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("Good Create Game")
-    void createGame() {
+    void createGame() throws DataAccessException {
         existingGameData = service.createGame(auth.authToken(), createGameData);
         assertNotNull(db.listGames());
         assertEquals(existingGameData, db.getGame(existingGameData.gameID()));
@@ -56,7 +57,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("Bad Create Game -- unauthorized")
-    void badCreateGame() {
+    void badCreateGame() throws DataAccessException {
         userService.logout(auth.authToken());
         Exception ex = assertThrows(Exception.class, () -> {service.createGame(auth.authToken(), createGameData);});
         assertEquals("unauthorized", ex.getMessage());
@@ -76,7 +77,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("Bad list Games -- unauthorized")
-    void badListGames() {
+    void badListGames() throws DataAccessException {
         userService.logout(auth.authToken());
         Exception ex = assertThrows(Exception.class, () -> {service.listGames(auth.authToken());});
         assertEquals("unauthorized", ex.getMessage());

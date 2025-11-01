@@ -1,10 +1,12 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserService {
@@ -17,7 +19,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public void clear(){
+    public void clear() throws DataAccessException {
         dataAccess.clear();
     }
 
@@ -28,16 +30,26 @@ public class UserService {
         if (dataAccess.getUser(user.username()) != null) {
             throw new Exception("already taken");
         }
-        String hashPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        var storedUser = new UserData(user.username(), user.email(), hashPass);
-        dataAccess.createUser(storedUser);
-        var auth = new AuthData(user.username(), generateAuthToken());
-        dataAccess.createAuth(auth);
+        try{
+            String hashPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+            var storedUser = new UserData(user.username(), user.email(), hashPass);
+            dataAccess.createUser(storedUser);
+            var auth = new AuthData(user.username(), generateAuthToken());
+            dataAccess.createAuth(auth);
 
-        return auth;
+            return auth;
+        } catch (DataAccessException e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public AuthData login(UserData loginCreds) throws Exception {
+        try{
+            dataAccess.getUser(loginCreds.username());
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
         if (loginCreds.username() == null || loginCreds.password() == null) {
             throw new BadRequestException("bad request");
         }
@@ -52,7 +64,7 @@ public class UserService {
         return new AuthData(loginCreds.username(), authToken);
     }
 
-    public void logout(String authToken) throws UnauthorizedException{
+    public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         dataAccess.deleteAuth(authToken);
     }
 
@@ -60,7 +72,7 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    boolean verifyPassword(String username, String providedClearTextPass){
+    boolean verifyPassword(String username, String providedClearTextPass) throws DataAccessException {
         var storedHashedPass = dataAccess.getUser(username).password();
         return BCrypt.checkpw(providedClearTextPass, storedHashedPass);
     }

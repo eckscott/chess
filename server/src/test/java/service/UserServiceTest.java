@@ -73,7 +73,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Good logout")
-    void logout(){
+    void logout() throws DataAccessException {
         service.logout(authData.authToken());
         assertNull(db.getAuth(authData.authToken()));
     }

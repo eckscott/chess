@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.GameData;
@@ -18,7 +19,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public GameData createGame(String authToken, GameData createGameRequest){
+    public GameData createGame(String authToken, GameData createGameRequest) throws DataAccessException {
         if (createGameRequest.gameName() == null) {
             throw new BadRequestException("bad request");
         }
@@ -33,7 +34,7 @@ public class GameService {
         return createGameData;
     }
 
-    public ListGamesResponse listGames(String authToken) throws Exception {
+    public ListGamesResponse listGames(String authToken) throws DataAccessException, UnauthorizedException{
         if (authToken == null || dataAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException("unauthorized");
         }

@@ -13,6 +13,7 @@ import service.GameService;
 import service.UnauthorizedException;
 import service.UserService;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -31,7 +32,7 @@ public class Server {
             server = Javalin.create(config -> config.staticFiles.add("web"));
 
             // clear
-            server.delete("db", ctx -> {userService.clear(); ctx.result("{}");});
+            server.delete("db", ctx -> clear(ctx));
 
             // users
             server.post("user", ctx -> register(ctx));
@@ -48,6 +49,16 @@ public class Server {
 
     }
 
+    private void clear(Context ctx){
+        try{
+            userService.clear();
+            ctx.result("{}");
+        } catch (DataAccessException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(500).result(msg);
+        }
+    }
+
     private void register(Context ctx){
         try{
             var serializer = new Gson();
@@ -61,6 +72,9 @@ public class Server {
         } catch (BadRequestException ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(400).result(msg);
+        } catch (DataAccessException ex){
+            var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+            ctx.status(500).result(msg);
         } catch (Exception ex){
             var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
             ctx.status(403).result(msg);
@@ -128,6 +142,9 @@ public class Server {
         catch (UnauthorizedException e) {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(401).result(msg);
+        } catch (DataAccessException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(500).result(msg);
         }
     }
 
@@ -138,7 +155,10 @@ public class Server {
             ListGamesResponse games = gameService.listGames(token);
 
             ctx.result(serializer.toJson(games));
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
+            var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
+            ctx.status(500).result(msg);
+        } catch (UnauthorizedException e) {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(401).result(msg);
         }
@@ -163,7 +183,7 @@ public class Server {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(401).result(msg);
         }
-        catch (RuntimeException e) {
+        catch (DataAccessException e) {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(500).result(msg);
         }

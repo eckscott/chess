@@ -24,7 +24,7 @@ public class SqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "DROP table users";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
@@ -40,22 +40,22 @@ public class SqlDataAccess implements DataAccess{
             }
             helper.configureDatabase();
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to clear database: %s", e.getMessage()));
         }
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
         try {
             var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
             helper.executeUpdate(statement, user.username(), user.email(), user.password());
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to clear database: %s", e.getMessage()));
         }
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT username, password, email FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
@@ -70,23 +70,23 @@ public class SqlDataAccess implements DataAccess{
                 }
             }
         } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to get user from database: %s", e.getMessage()));
         }
         return null;
     }
 
     @Override
-    public void createAuth(AuthData authorization) {
+    public void createAuth(AuthData authorization) throws DataAccessException {
         try{
             var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
             helper.executeUpdate(statement, authorization.authToken(), authorization.username());
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to create auth in database: %s", e.getMessage()));
         }
     }
 
     @Override
-    public String getAuth(String authToken) {
+    public String getAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT username FROM auth WHERE authToken=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
@@ -98,13 +98,13 @@ public class SqlDataAccess implements DataAccess{
                 }
             }
         } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to get auth from database: %s", e.getMessage()));
         }
         return null;
     }
 
     @Override
-    public void deleteAuth(String authToken) throws UnauthorizedException {
+    public void deleteAuth(String authToken) throws UnauthorizedException, DataAccessException {
         if (getAuth(authToken) == null) {
             throw new UnauthorizedException("unauthorized");
         }
@@ -119,17 +119,17 @@ public class SqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void createGame(GameData gameData) {
+    public void createGame(GameData gameData) throws DataAccessException {
         try{
             var statement = "INSERT INTO games (gameID, gameName) VALUES (?, ?)";
             helper.executeUpdate(statement, gameData.gameID(), gameData.gameName());
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to create game in database: %s", e.getMessage()));
         }
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM games WHERE gameID=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
@@ -147,13 +147,13 @@ public class SqlDataAccess implements DataAccess{
                 }
             }
         } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to get auth from database: %s", e.getMessage()));
         }
         return null;
     }
 
     @Override
-    public Collection<GameData> listGames() {
+    public Collection<GameData> listGames() throws DataAccessException{
         Collection<GameData> games = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM games";
@@ -171,7 +171,7 @@ public class SqlDataAccess implements DataAccess{
                 }
             }
         } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(String.format("Unable to list games from database: %s", e.getMessage()));
         }
         return games;
     }

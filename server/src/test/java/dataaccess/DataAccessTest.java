@@ -24,7 +24,7 @@ class DataAccessTest {
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
         db.createUser(user);
         db.clear();
         assertNull(db.getUser("joe"));
@@ -32,7 +32,7 @@ class DataAccessTest {
 
     @Test
     @DisplayName("Good createUser")
-    void createUser() {
+    void createUser() throws DataAccessException {
         db.createUser(user);
         assertEquals(user, db.getUser(user.username()));
     }
@@ -57,7 +57,7 @@ class DataAccessTest {
 
     @Test
     @DisplayName("Good createAuth")
-    void createAuth() {
+    void createAuth() throws DataAccessException {
         db.createAuth(auth);
         assertEquals(auth.authToken(), db.getAuth(auth.authToken()));
     }
