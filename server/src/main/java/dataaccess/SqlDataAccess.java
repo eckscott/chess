@@ -7,20 +7,15 @@ import model.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import dataaccess.SqlHelperMethods;
-import org.eclipse.jetty.server.Authentication;
-import service.UnauthorizedException;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
+import service.UnauthorizedException;
 
 public class SqlDataAccess implements DataAccess{
 
-    private static final SqlHelperMethods helper = new SqlHelperMethods();
+    private static final SqlHelperMethods HELPER_METHODS = new SqlHelperMethods();
 
     public SqlDataAccess() throws DataAccessException{
-        helper.configureDatabase();
+        HELPER_METHODS.configureDatabase();
     }
 
     @Override
@@ -38,7 +33,7 @@ public class SqlDataAccess implements DataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement3)){
                 ps.executeUpdate();
             }
-            helper.configureDatabase();
+            HELPER_METHODS.configureDatabase();
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(String.format("Unable to clear database: %s", e.getMessage()));
         }
@@ -48,9 +43,9 @@ public class SqlDataAccess implements DataAccess{
     public void createUser(UserData user) throws DataAccessException {
         try {
             var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-            helper.executeUpdate(statement, user.username(), user.email(), user.password());
+            HELPER_METHODS.executeUpdate(statement, user.username(), user.email(), user.password());
         } catch (DataAccessException e) {
-            throw new DataAccessException(String.format("Unable to clear database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Unable to create user in database: %s", e.getMessage()));
         }
     }
 
@@ -79,7 +74,7 @@ public class SqlDataAccess implements DataAccess{
     public void createAuth(AuthData authorization) throws DataAccessException {
         try{
             var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
-            helper.executeUpdate(statement, authorization.authToken(), authorization.username());
+            HELPER_METHODS.executeUpdate(statement, authorization.authToken(), authorization.username());
         } catch (DataAccessException e) {
             throw new DataAccessException(String.format("Unable to create auth in database: %s", e.getMessage()));
         }
@@ -122,7 +117,7 @@ public class SqlDataAccess implements DataAccess{
     public void createGame(GameData gameData) throws DataAccessException {
         try{
             var statement = "INSERT INTO games (gameID, gameName) VALUES (?, ?)";
-            helper.executeUpdate(statement, gameData.gameID(), gameData.gameName());
+            HELPER_METHODS.executeUpdate(statement, gameData.gameID(), gameData.gameName());
         } catch (DataAccessException e) {
             throw new DataAccessException(String.format("Unable to create game in database: %s", e.getMessage()));
         }
@@ -183,14 +178,14 @@ public class SqlDataAccess implements DataAccess{
                 throw new Exception("already taken");
             }
             var statement = "UPDATE games SET whiteUsername = (?) WHERE gameID = (?)";
-            helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
+            HELPER_METHODS.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
         }
         if (joinGameReq.playerColor() == ChessGame.TeamColor.BLACK){
             if (getGame(joinGameReq.gameID()).blackUsername() != null){
                 throw new Exception("already taken");
             }
             var statement = "UPDATE games SET blackUsername = (?) WHERE gameID = (?)";
-            helper.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
+            HELPER_METHODS.executeUpdate(statement, getAuth(authToken), joinGameReq.gameID());
         }
     }
 

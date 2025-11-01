@@ -21,6 +21,7 @@ class DataAccessTest {
         db = new SqlDataAccess();
         user = new UserData("joe", "j@j.com", "123");
         auth = new AuthData("joe", "xyz");
+        db.clear();
     }
 
     @Test
@@ -39,8 +40,9 @@ class DataAccessTest {
 
     @Test
     @DisplayName("Bad createUser")
-    void createBadUser() {
-
+    void createBadUser() throws DataAccessException {
+        db.createUser(user);
+        d
     }
 
     @Test
@@ -59,7 +61,7 @@ class DataAccessTest {
     @DisplayName("Good createAuth")
     void createAuth() throws DataAccessException {
         db.createAuth(auth);
-        assertEquals(auth.authToken(), db.getAuth(auth.authToken()));
+        assertEquals(auth.username(), db.getAuth(auth.authToken()));
     }
 
     @Test
