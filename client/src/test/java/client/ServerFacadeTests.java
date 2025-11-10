@@ -1,14 +1,19 @@
 package client;
 
+import dataaccess.MemoryDataAccess;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
+    private static MemoryDataAccess db;
 
     @BeforeAll
     public static void init() {
@@ -23,11 +28,17 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    public void restart() {
+
+    }
+
 
     @Test
     @DisplayName("Positive register Test")
     public void registerTest() {
-        var authData = facade.register("player1", "password1", "p1@email.com");
+        AuthData authData = facade.register("player1", "password1", "p1@email.com");
+        assertTrue(authData.authToken().length() > 10);
     }
 
 }
