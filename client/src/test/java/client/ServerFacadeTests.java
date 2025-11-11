@@ -13,7 +13,6 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
-    private static MemoryDataAccess db;
 
     @BeforeAll
     public static void init() {
@@ -29,16 +28,30 @@ public class ServerFacadeTests {
     }
 
     @BeforeEach
-    public void restart() {
-
+    public void reset() {
+        facade.clear();
     }
 
+    @Test
+    @DisplayName("clear test")
+    public void clearTest() {
+        facade.clear();
+        //assertNull()
+    }
 
     @Test
     @DisplayName("Positive register Test")
     public void registerTest() {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    @DisplayName("Positive login Test")
+    public void loginTest() {
+        AuthData registerAuthData = facade.register("player1", "password1", "p1@email.com");
+        AuthData loginAuthData = facade.login("player1", "password1");
+        assertTrue(loginAuthData.authToken().length() > 10);
     }
 
 }

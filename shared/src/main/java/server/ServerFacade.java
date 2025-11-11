@@ -18,19 +18,21 @@ public class ServerFacade {
         this.port = port;
     }
 
+    public void clear() {
+        var req = buildReq("DELETE", "/db", null);
+        requestHandler(req);
+    }
 
     public AuthData register(String username, String password, String email) {
         var registerData = new UserData(username, email, password);
         var req = buildReq("POST", "/user", registerData);
-        var response = sendReq(req);
-        var status = response.statusCode();
-        if (status == 200){
-            var jsonResponse = response.body();
-            return new Gson().fromJson(jsonResponse, AuthData.class);
-        }
-        else {
-            throw new RuntimeException("Bad response" + status);
-        }
+        return requestHandler(req);
+    }
+
+    public AuthData login(String username, String password) {
+        var loginData = new UserData(username, null, password);
+        var req = buildReq("POST", "/session", loginData);
+        return requestHandler(req);
     }
 
     private HttpRequest buildReq(String method, String path, Object body) {
@@ -59,9 +61,17 @@ public class ServerFacade {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
     }
 
-
+    private AuthData requestHandler(HttpRequest req){
+        var response = sendReq(req);
+        if (response.statusCode() == 200){
+            var jsonResponse = response.body();
+            return new Gson().fromJson(jsonResponse, AuthData.class);
+        }
+        else {
+            throw new RuntimeException("Bad response: " + response.statusCode());
+        }
+    }
 
 }
