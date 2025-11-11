@@ -8,9 +8,11 @@ import java.util.Scanner;
 public class PreLogin {
 
     private final ServerFacade server;
+    private States currState;
 
     public PreLogin(int port) {
         server = new ServerFacade(port);
+        currState = States.SIGNEDOUT;
     }
 
     public void run() throws Exception {
@@ -18,7 +20,7 @@ public class PreLogin {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")){
+        while ((!result.equals("quit")) && (currState == States.SIGNEDOUT)){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
@@ -41,7 +43,7 @@ public class PreLogin {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd){
             case "quit" -> "quit";
-            case "login" -> "Login functionality place holder";
+            case "login" -> login(params);
             case "register" -> register(params);
             default -> help();
         };
@@ -62,8 +64,20 @@ public class PreLogin {
             String password = params[1];
             String email = params[2];
             var auth = server.register(username, password, email);
+            currState = States.SIGNEDIN;
             return String.format("You have successfully registered and are now signed in as %s", auth.username());
         }
         throw new Exception("Didn't work");
+    }
+
+    private String login(String... params) throws Exception{
+        if (params.length == 2){
+            String username = params[0];
+            String password = params[1];
+            var auth = server.login(username, password);
+            currState = States.SIGNEDIN;
+            return String.format("You have successfully signed in as %s", auth.username());
+        }
+        throw new Exception("Invalid input: expected <USERNAME> <PASSWORD>");
     }
 }
