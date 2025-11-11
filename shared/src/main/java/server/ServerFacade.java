@@ -21,8 +21,7 @@ public class ServerFacade {
 
     public AuthData register(String username, String password, String email) {
         var registerData = new UserData(username, email, password);
-        var jsonBody = new Gson().toJson(registerData);
-        var req = buildReq("POST", "/user", jsonBody);
+        var req = buildReq("POST", "/user", registerData);
         var response = sendReq(req);
         var status = response.statusCode();
         if (status == 200){
