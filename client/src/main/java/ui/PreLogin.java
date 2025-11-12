@@ -15,7 +15,7 @@ public class PreLogin {
         currState = States.SIGNEDOUT;
     }
 
-    public void run() throws Exception {
+    public States run() throws Exception {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "♕ 240 Chess Client: type <help> for options");
 
         Scanner scanner = new Scanner(System.in);
@@ -24,13 +24,14 @@ public class PreLogin {
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
-            if (!result.equals("quit")) {
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
-            }
-            else {
+            if (result.equals("quit")){
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Thanks for playing!");
+                currState = States.QUIT;
+                return currState;
             }
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
         }
+        return currState;
     }
 
     private void printPrompt() {
@@ -65,7 +66,7 @@ public class PreLogin {
             String email = params[2];
             var auth = server.register(username, password, email);
             currState = States.SIGNEDIN;
-            return String.format("You have successfully registered and are now signed in as %s", auth.username());
+            return String.format("You have successfully registered and are now signed in as %s\n", auth.username());
         }
         throw new Exception("Didn't work");
     }
@@ -76,7 +77,7 @@ public class PreLogin {
             String password = params[1];
             var auth = server.login(username, password);
             currState = States.SIGNEDIN;
-            return String.format("You have successfully signed in as %s", auth.username());
+            return String.format("You have successfully signed in as %s\n", auth.username());
         }
         throw new Exception("Invalid input: expected <USERNAME> <PASSWORD>");
     }
