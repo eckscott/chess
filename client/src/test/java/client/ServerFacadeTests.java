@@ -54,4 +54,11 @@ public class ServerFacadeTests {
         assertTrue(loginAuthData.authToken().length() > 10);
     }
 
+    @Test
+    @DisplayName("Positing logout Test")
+    public void logoutTest() {
+        AuthData authData = facade.register("player1", "password1", "p1@email.com");
+        facade.logout();
+    }
+
 }

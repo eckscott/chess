@@ -35,6 +35,18 @@ public class ServerFacade {
         return requestHandler(req);
     }
 
+    public void logout(){
+        var req = buildReq("DELETE", "/session", null);
+        var response = sendReq(req);
+        if (response.statusCode() != 200){
+            throw new RuntimeException("Bad response: " + response.statusCode());
+        }
+    }
+
+    private AuthData getAuth(){
+        var req = buildReq("GET", "/user", )
+    }
+
     private HttpRequest buildReq(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + path))
