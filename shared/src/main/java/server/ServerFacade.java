@@ -19,40 +19,39 @@ public class ServerFacade {
     }
 
     public void clear() {
-        var req = buildReq("DELETE", "/db", null);
+        var req = buildReq("DELETE", "/db", null, null);
         requestHandler(req);
     }
 
     public AuthData register(String username, String password, String email) {
         var registerData = new UserData(username, email, password);
-        var req = buildReq("POST", "/user", registerData);
+        var req = buildReq("POST", "/user", registerData, null);
         return requestHandler(req);
     }
 
     public AuthData login(String username, String password) {
         var loginData = new UserData(username, null, password);
-        var req = buildReq("POST", "/session", loginData);
+        var req = buildReq("POST", "/session", loginData, null);
         return requestHandler(req);
     }
 
-    public void logout(){
-        var req = buildReq("DELETE", "/session", null);
+    public void logout(AuthData authorization){
+        var req = buildReq("DELETE", "/session", null, authorization.authToken());
         var response = sendReq(req);
         if (response.statusCode() != 200){
             throw new RuntimeException("Bad response: " + response.statusCode());
         }
     }
 
-    private AuthData getAuth(){
-        var req = buildReq("GET", "/user", )
-    }
-
-    private HttpRequest buildReq(String method, String path, Object body) {
+    private HttpRequest buildReq(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("Authorization", authToken);
         }
         return request.build();
     }

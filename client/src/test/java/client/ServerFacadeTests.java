@@ -58,7 +58,7 @@ public class ServerFacadeTests {
     @DisplayName("Positing logout Test")
     public void logoutTest() {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
-        facade.logout();
+        facade.logout(authData);
     }
 
 }

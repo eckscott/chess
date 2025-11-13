@@ -1,5 +1,7 @@
 package ui;
 
+import client.ClientContext;
+import model.AuthData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -9,10 +11,12 @@ public class PreLogin {
 
     private final ServerFacade server;
     private States currState;
+    private final ClientContext ctx;
 
-    public PreLogin(int port) {
+    public PreLogin(int port, ClientContext ctx) {
         server = new ServerFacade(port);
         currState = States.SIGNEDOUT;
+        this.ctx = ctx;
     }
 
     public States run() throws Exception {
@@ -65,6 +69,7 @@ public class PreLogin {
             String password = params[1];
             String email = params[2];
             var auth = server.register(username, password, email);
+            ctx.setCurrUser(auth);
             currState = States.SIGNEDIN;
             return String.format("You have successfully registered and are now signed in as %s\n", auth.username());
         }
@@ -76,6 +81,7 @@ public class PreLogin {
             String username = params[0];
             String password = params[1];
             var auth = server.login(username, password);
+            ctx.setCurrUser(auth);
             currState = States.SIGNEDIN;
             return String.format("You have successfully signed in as %s\n", auth.username());
         }

@@ -1,5 +1,7 @@
 package ui;
 
+import client.ClientContext;
+import model.*;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -9,10 +11,12 @@ public class PostLogin {
 
     private final ServerFacade server;
     private States currState;
+    private final ClientContext ctx;
 
-    public PostLogin(int port) {
+    public PostLogin(int port, ClientContext ctx) {
         server = new ServerFacade(port);
         currState = States.SIGNEDIN;
+        this.ctx = ctx;
     }
 
     public States run() throws Exception {
@@ -60,7 +64,7 @@ public class PostLogin {
         if (params.length != 0){
             throw new Exception("Provided parameters and expected none");
         }
-        server.logout();
+        server.logout(ctx.getCurrUser());
         return "Thanks for playing!\n";
     }
 
