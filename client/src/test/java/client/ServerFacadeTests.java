@@ -55,10 +55,18 @@ public class ServerFacadeTests {
     }
 
     @Test
-    @DisplayName("Positing logout Test")
+    @DisplayName("Positive logout Test")
     public void logoutTest() {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         facade.logout(authData);
+    }
+
+    @Test
+    @DisplayName("Positive create Game Test")
+    public void createGameTest() {
+        AuthData authData = facade.register("player1", "password1", "p1@email.com");
+        GameData createGameResult = facade.createGame(authData, new GameData(0, null, null, "newGame", null));
+        assertNotEquals(0, createGameResult.gameID());
     }
 
 }

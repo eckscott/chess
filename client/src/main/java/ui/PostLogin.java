@@ -47,6 +47,7 @@ public class PostLogin {
         return switch (cmd){
             case "quit" -> "quit";
             case "logout" -> logout(params);
+            case "create game" -> createGame(params);
             default -> help();
         };
     }
@@ -55,8 +56,11 @@ public class PostLogin {
         return """
                 help - lists command options
                 quit - exits the program
-                login <USERNAME> <PASSWORD> - to play chess
-                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                logout - logs out
+                create game <NAME> - create a new chess game
+                list games - list all the games
+                play game <ID> [WHITE|BLACK] - join a game as a player
+                observe game <ID> - spectate a game
                 """;
     }
 
@@ -69,26 +73,13 @@ public class PostLogin {
         return "Thanks for playing!\n";
     }
 
-    private String register(String... params) throws Exception {
-        if (params.length == 3){
-            String username = params[0];
-            String password = params[1];
-            String email = params[2];
-            var auth = server.register(username, password, email);
-            currState = States.SIGNEDIN;
-            return String.format("You have successfully registered and are now signed in as %s\n", auth.username());
+    private String createGame(String... params) throws Exception {
+        if (params.length == 1){
+            var createGameReq = new GameData(0, null, null, params[0], null);
+            var createGameResult = server.createGame(ctx.getCurrUser(), createGameReq);
+            return String.format("gameID: %d\n", createGameResult.gameID());
         }
-        throw new Exception("Didn't work");
+        throw new Exception("Wrong amount of parameters provided");
     }
 
-    private String login(String... params) throws Exception{
-        if (params.length == 2){
-            String username = params[0];
-            String password = params[1];
-            var auth = server.login(username, password);
-            currState = States.SIGNEDIN;
-            return String.format("You have successfully signed in as %s\n", auth.username());
-        }
-        throw new Exception("Invalid input: expected <USERNAME> <PASSWORD>");
-    }
 }
