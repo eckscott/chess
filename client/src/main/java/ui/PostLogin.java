@@ -22,7 +22,7 @@ public class PostLogin {
     public States run() throws Exception {
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while ((!result.equals("quit")) && (currState == States.SIGNEDIN)){
+        while (currState == States.SIGNEDIN){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
@@ -65,6 +65,7 @@ public class PostLogin {
             throw new Exception("Provided parameters and expected none");
         }
         server.logout(ctx.getCurrUser());
+        currState = States.QUIT;
         return "Thanks for playing!\n";
     }
 

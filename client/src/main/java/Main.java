@@ -20,8 +20,7 @@ public class Main {
                         currState = preLogin.run();
                     }
                     case SIGNEDIN -> {
-                        System.out.print("Signed in place holder");
-                        currState = States.QUIT;
+                        currState = postLogin.run();
                     }
                     case INGAME -> {
                         System.out.print("In game place holder");

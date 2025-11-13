@@ -24,7 +24,7 @@ public class PreLogin {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while ((!result.equals("quit")) && (currState == States.SIGNEDOUT)){
+        while (currState == States.SIGNEDOUT){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
