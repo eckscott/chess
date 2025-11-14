@@ -1,7 +1,7 @@
 package ui;
 
 import client.ClientContext;
-import model.AuthData;
+import client.States;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -10,12 +10,11 @@ import java.util.Scanner;
 public class PreLogin {
 
     private final ServerFacade server;
-    private States currState;
     private final ClientContext ctx;
 
     public PreLogin(int port, ClientContext ctx) {
         server = new ServerFacade(port);
-        currState = States.SIGNEDOUT;
+        ctx.setCurrState(States.SIGNEDOUT);
         this.ctx = ctx;
     }
 
@@ -24,18 +23,18 @@ public class PreLogin {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (currState == States.SIGNEDOUT){
+        while (ctx.getCurrState() == States.SIGNEDOUT){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
             if (result.equals("quit")){
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Thanks for playing!");
-                currState = States.QUIT;
-                return currState;
+                ctx.setCurrState(States.QUIT);
+                return ctx.getCurrState();
             }
             System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
         }
-        return currState;
+        return ctx.getCurrState();
     }
 
     private void printPrompt() {
@@ -70,7 +69,7 @@ public class PreLogin {
             String email = params[2];
             var auth = server.register(username, password, email);
             ctx.setCurrUser(auth);
-            currState = States.SIGNEDIN;
+            ctx.setCurrState(States.SIGNEDIN);
             return String.format("You have successfully registered and are now signed in as %s\n", auth.username());
         }
         throw new Exception("Didn't work");
@@ -82,7 +81,7 @@ public class PreLogin {
             String password = params[1];
             var auth = server.login(username, password);
             ctx.setCurrUser(auth);
-            currState = States.SIGNEDIN;
+            ctx.setCurrState(States.SIGNEDIN);
             return String.format("You have successfully signed in as %s\n", auth.username());
         }
         throw new Exception("Invalid input: expected <USERNAME> <PASSWORD>");

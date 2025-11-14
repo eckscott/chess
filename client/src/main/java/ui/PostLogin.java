@@ -1,6 +1,7 @@
 package ui;
 
 import client.ClientContext;
+import client.States;
 import model.*;
 import server.ServerFacade;
 
@@ -10,30 +11,30 @@ import java.util.Scanner;
 public class PostLogin {
 
     private final ServerFacade server;
-    private States currState;
     private final ClientContext ctx;
 
     public PostLogin(int port, ClientContext ctx) {
         server = new ServerFacade(port);
-        currState = States.SIGNEDIN;
         this.ctx = ctx;
     }
 
     public States run() throws Exception {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "type <help> for options");
+
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (currState == States.SIGNEDIN){
+        while (ctx.getCurrState() == States.SIGNEDIN){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
             if (result.equals("quit")){
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Thanks for playing!");
-                currState = States.QUIT;
-                return currState;
+                ctx.setCurrState(States.QUIT);
+                return ctx.getCurrState();
             }
             System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
         }
-        return currState;
+        return ctx.getCurrState();
     }
 
     private void printPrompt() {
@@ -47,7 +48,8 @@ public class PostLogin {
         return switch (cmd){
             case "quit" -> "quit";
             case "logout" -> logout(params);
-            case "create game" -> createGame(params);
+            case "creategame" -> createGame(params);
+            case "listgames" -> listGames(params);
             default -> help();
         };
     }
@@ -57,10 +59,10 @@ public class PostLogin {
                 help - lists command options
                 quit - exits the program
                 logout - logs out
-                create game <NAME> - create a new chess game
-                list games - list all the games
-                play game <ID> [WHITE|BLACK] - join a game as a player
-                observe game <ID> - spectate a game
+                creategame <NAME> - create a new chess game
+                listgames - list all the games
+                playgame <ID> [WHITE|BLACK] - join a game as a player
+                observegame <ID> - spectate a game
                 """;
     }
 
@@ -69,7 +71,7 @@ public class PostLogin {
             throw new Exception("Provided parameters and expected none");
         }
         server.logout(ctx.getCurrUser());
-        currState = States.SIGNEDOUT;
+        ctx.setCurrState(States.SIGNEDOUT);
         return "Thanks for playing!\n";
     }
 
@@ -77,9 +79,24 @@ public class PostLogin {
         if (params.length == 1){
             var createGameReq = new GameData(0, null, null, params[0], null);
             var createGameResult = server.createGame(ctx.getCurrUser(), createGameReq);
-            return String.format("gameID: %d\n", createGameResult.gameID());
+            return String.format("%s created successfully!\n", createGameResult.gameName());
         }
         throw new Exception("Wrong amount of parameters provided");
+    }
+
+    private String listGames(String... params) throws Exception {
+        if (params.length != 0){
+            throw new Exception("Provided parameters and expected none");
+        }
+        ListGamesResponse response = server.listGames(ctx.getCurrUser());
+        StringBuilder sb = new StringBuilder();
+        for (GameData game : response.games()) {
+            sb.append("Name: ").append(game.gameName())
+                    .append(", whitePlayer: ").append(game.whiteUsername())
+                    .append(", blackPlayer: ").append(game.blackUsername())
+                    .append("\n");
+        }
+        return sb.toString();
     }
 
 }
