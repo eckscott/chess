@@ -52,11 +52,23 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @DisplayName("Negative register Test")
+    public void badRegister() {
+
+    }
+
+    @Test
     @DisplayName("Positive login Test")
     public void loginTest() {
         AuthData registerAuthData = facade.register("player1", "password1", "p1@email.com");
         AuthData loginAuthData = facade.login("player1", "password1");
         assertTrue(loginAuthData.authToken().length() > 10);
+    }
+
+    @Test
+    @DisplayName("Negative login Test")
+    public void badLogin() {
+
     }
 
     @Test
@@ -67,11 +79,23 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @DisplayName("Negative logout Test")
+    public void badLogout() {
+
+    }
+
+    @Test
     @DisplayName("Positive create Game Test")
     public void createGameTest() {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         GameData createGameResult = facade.createGame(authData, new GameData(0, null, null, "newGame", null));
         assertNotEquals(0, createGameResult.gameID());
+    }
+
+    @Test
+    @DisplayName("Negative create Game Test")
+    public void badCreateGame() {
+
     }
 
     @Test
@@ -90,11 +114,23 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @DisplayName("Negative list games Test")
+    public void badListGames() {
+
+    }
+
+    @Test
     @DisplayName("Positive join game Test")
     public void joinGameTest() {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         GameData createGameResult1 = facade.createGame(authData, new GameData(0, null, null, "newGame1", null));
         facade.joinGame(authData, new JoinGameData(ChessGame.TeamColor.WHITE, createGameResult1.gameID()));
+    }
+
+    @Test
+    @DisplayName("Negative join game Test")
+    public void badJoinGame() {
+
     }
 
 }
