@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import model.ListGamesResponse;
 import model.UserData;
 
 import java.io.IOException;
@@ -52,6 +53,16 @@ public class ServerFacade {
         }
         var jsonResponse = response.body();
         return new Gson().fromJson(jsonResponse, GameData.class);
+    }
+
+    public ListGamesResponse listGames(AuthData authorization){
+        var req = buildReq("GET", "/game", null, authorization.authToken());
+        var response = sendReq(req);
+        if (response.statusCode() != 200){
+            throw new RuntimeException("Bad response: " + response.statusCode());
+        }
+        var jsonResponse = response.body();
+        return new Gson().fromJson(jsonResponse, ListGamesResponse.class);
     }
 
     private HttpRequest buildReq(String method, String path, Object body, String authToken) {

@@ -69,7 +69,7 @@ public class PostLogin {
             throw new Exception("Provided parameters and expected none");
         }
         server.logout(ctx.getCurrUser());
-        currState = States.QUIT;
+        currState = States.SIGNEDOUT;
         return "Thanks for playing!\n";
     }
 

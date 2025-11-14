@@ -6,6 +6,10 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -67,6 +71,21 @@ public class ServerFacadeTests {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         GameData createGameResult = facade.createGame(authData, new GameData(0, null, null, "newGame", null));
         assertNotEquals(0, createGameResult.gameID());
+    }
+
+    @Test
+    @DisplayName("Positive list games Test")
+    public void listGamesTest() {
+        AuthData authData = facade.register("player1", "password1", "p1@email.com");
+        GameData createGameResult1 = facade.createGame(authData, new GameData(0, null, null, "newGame1", null));
+        GameData createGameResult2 = facade.createGame(authData, new GameData(0, null, null, "newGame2", null));
+        GameData createGameResult3 = facade.createGame(authData, new GameData(0, null, null, "newGame3", null));
+        Collection<GameData> gameRequests = new ArrayList<>();
+        gameRequests.add(createGameResult1);
+        gameRequests.add(createGameResult2);
+        gameRequests.add(createGameResult3);
+        ListGamesResponse listResult = facade.listGames(authData);
+        assertTrue(listResult.games().containsAll(gameRequests));
     }
 
 }
