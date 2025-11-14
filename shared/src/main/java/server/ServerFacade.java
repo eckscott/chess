@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
-import model.ListGamesResponse;
-import model.UserData;
+import model.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -63,6 +60,24 @@ public class ServerFacade {
         }
         var jsonResponse = response.body();
         return new Gson().fromJson(jsonResponse, ListGamesResponse.class);
+    }
+
+    public GameData findGame(AuthData authorization, String gameName){
+        ListGamesResponse listOfGames = listGames(authorization);
+        for (GameData game : listOfGames.games()){
+            if (game.gameName().equals(gameName)){
+                return game;
+            }
+        }
+        return null;
+    }
+
+    public void joinGame(AuthData authorization, JoinGameData joinGameReq){
+        var req = buildReq("POST", "/game", joinGameReq, authorization.authToken());
+        var response = sendReq(req);
+        if (response.statusCode() != 200){
+            throw new RuntimeException("Bad response: " + response.statusCode());
+        }
     }
 
     private HttpRequest buildReq(String method, String path, Object body, String authToken) {

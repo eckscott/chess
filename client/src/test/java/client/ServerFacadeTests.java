@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.MemoryDataAccess;
 import model.*;
 import org.junit.jupiter.api.*;
@@ -86,6 +87,15 @@ public class ServerFacadeTests {
         gameRequests.add(createGameResult3);
         ListGamesResponse listResult = facade.listGames(authData);
         assertTrue(listResult.games().containsAll(gameRequests));
+    }
+
+    @Test
+    @DisplayName("Positive join game Test")
+    public void joinGameTest() {
+        AuthData authData = facade.register("player1", "password1", "p1@email.com");
+        GameData createGameResult1 = facade.createGame(authData, new GameData(0, null, null, "newGame1", null));
+        facade.joinGame(authData, new JoinGameData(ChessGame.TeamColor.WHITE, createGameResult1.gameID()));
+        assertNotNull(createGameResult1.whiteUsername());
     }
 
 }

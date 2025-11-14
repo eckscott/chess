@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import client.ClientContext;
 import client.States;
 import model.*;
@@ -50,6 +51,7 @@ public class PostLogin {
             case "logout" -> logout(params);
             case "creategame" -> createGame(params);
             case "listgames" -> listGames(params);
+            case "playgame" -> playGame(params);
             default -> help();
         };
     }
@@ -97,6 +99,26 @@ public class PostLogin {
                     .append("\n");
         }
         return sb.toString();
+    }
+
+    private String playGame(String... params) throws Exception {
+        if (params.length == 2){
+            String gameName = params[0];
+            String teamColor = params[1];
+            GameData gameToJoin = server.findGame(ctx.getCurrUser(), gameName);
+            if (teamColor.equals("white")){
+                JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.WHITE, gameToJoin.gameID());
+                server.joinGame(ctx.getCurrUser(), joinReq);
+                return String.format("Joined %s as white player\n", gameName);
+            }
+            else if (teamColor.equals("black")){
+                JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.BLACK, gameToJoin.gameID());
+                server.joinGame(ctx.getCurrUser(), joinReq);
+                return String.format("Joined %s as black player\n", gameName);
+            }
+            return "Couldn't join game";
+        }
+        throw new Exception("Wrong amount of parameters provided\n");
     }
 
 }
