@@ -62,12 +62,15 @@ public class ServerFacade {
         return new Gson().fromJson(jsonResponse, ListGamesResponse.class);
     }
 
-    public GameData findGame(AuthData authorization, String gameName){
+    public GameData findGame(AuthData authorization, String gameIndexString){
         ListGamesResponse listOfGames = listGames(authorization);
+        int gameIndex = Integer.parseInt(gameIndexString);
+        int i = 0;
         for (GameData game : listOfGames.games()){
-            if (game.gameName().equals(gameName)){
+            if (i == gameIndex - 1){
                 return game;
             }
+            i++;
         }
         return null;
     }

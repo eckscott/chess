@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         int port = 8080;
         var ctx = new ClientContext();
-        States currState = States.INGAME;
+        States currState = States.SIGNEDOUT;
 
         PreLogin preLogin = new PreLogin(port, ctx);
         PostLogin postLogin = new PostLogin(port, ctx);

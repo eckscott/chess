@@ -21,9 +21,10 @@ public class InGame {
 
     public States run() throws Exception {
         drawBoard();
+
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (ctx.getCurrState() == States.SIGNEDIN){
+        while (ctx.getCurrState() == States.INGAME){
             printPrompt();
             String line = scanner.nextLine();
             result = eval(line);
@@ -38,7 +39,7 @@ public class InGame {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED IN] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[PLAYING GAME] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
     private void drawBoard() {

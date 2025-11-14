@@ -103,18 +103,20 @@ public class PostLogin {
 
     private String playGame(String... params) throws Exception {
         if (params.length == 2){
-            String gameName = params[0];
+            String gameIndex = params[0];
             String teamColor = params[1];
-            GameData gameToJoin = server.findGame(ctx.getCurrUser(), gameName);
+            GameData gameToJoin = server.findGame(ctx.getCurrUser(), gameIndex);
             if (teamColor.equals("white")){
                 JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.WHITE, gameToJoin.gameID());
                 server.joinGame(ctx.getCurrUser(), joinReq);
-                return String.format("Joined %s as white player\n", gameName);
+                ctx.setCurrState(States.INGAME);
+                return String.format("Joined game %s as white player\n", gameIndex);
             }
             else if (teamColor.equals("black")){
                 JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.BLACK, gameToJoin.gameID());
                 server.joinGame(ctx.getCurrUser(), joinReq);
-                return String.format("Joined %s as black player\n", gameName);
+                ctx.setCurrState(States.INGAME);
+                return String.format("Joined game %s as black player\n", gameIndex);
             }
             return "Couldn't join game";
         }
