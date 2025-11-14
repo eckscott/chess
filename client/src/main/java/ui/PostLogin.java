@@ -110,12 +110,14 @@ public class PostLogin {
                 JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.WHITE, gameToJoin.gameID());
                 server.joinGame(ctx.getCurrUser(), joinReq);
                 ctx.setCurrState(States.INGAME);
+                ctx.setCurrRole(ChessGame.TeamColor.WHITE);
                 return String.format("Joined game %s as white player\n", gameIndex);
             }
             else if (teamColor.equals("black")){
                 JoinGameData joinReq = new JoinGameData(ChessGame.TeamColor.BLACK, gameToJoin.gameID());
                 server.joinGame(ctx.getCurrUser(), joinReq);
                 ctx.setCurrState(States.INGAME);
+                ctx.setCurrRole(ChessGame.TeamColor.BLACK);
                 return String.format("Joined game %s as black player\n", gameIndex);
             }
             return "Couldn't join game";
