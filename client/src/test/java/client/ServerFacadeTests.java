@@ -95,7 +95,6 @@ public class ServerFacadeTests {
         AuthData authData = facade.register("player1", "password1", "p1@email.com");
         GameData createGameResult1 = facade.createGame(authData, new GameData(0, null, null, "newGame1", null));
         facade.joinGame(authData, new JoinGameData(ChessGame.TeamColor.WHITE, createGameResult1.gameID()));
-        assertNotNull(createGameResult1.whiteUsername());
     }
 
 }

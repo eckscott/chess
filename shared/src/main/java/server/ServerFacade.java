@@ -73,7 +73,7 @@ public class ServerFacade {
     }
 
     public void joinGame(AuthData authorization, JoinGameData joinGameReq){
-        var req = buildReq("POST", "/game", joinGameReq, authorization.authToken());
+        var req = buildReq("PUT", "/game", joinGameReq, authorization.authToken());
         var response = sendReq(req);
         if (response.statusCode() != 200){
             throw new RuntimeException("Bad response: " + response.statusCode());
