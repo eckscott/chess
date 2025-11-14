@@ -20,7 +20,7 @@ public class InGame {
     }
 
     public States run() throws Exception {
-
+        drawBoard();
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (ctx.getCurrState() == States.SIGNEDIN){
@@ -43,12 +43,15 @@ public class InGame {
 
     private void drawBoard() {
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                EscapeSequences.EMPTY + "a" + EscapeSequences.EMPTY + "b" + EscapeSequences.EMPTY + "c" + EscapeSequences.EMPTY + "d" + EscapeSequences.EMPTY +
-                "e" + EscapeSequences.EMPTY + "f" + EscapeSequences.EMPTY + "g" + EscapeSequences.EMPTY + "h" + EscapeSequences.EMPTY + "\n" +
+                "   " + " a " + "  b  "  + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "\n" +
 
-                " 8 " + EscapeSequences.BLACK_ROOK + EscapeSequences.EMPTY + EscapeSequences.BLACK_KNIGHT + EscapeSequences.EMPTY + EscapeSequences.BLACK_BISHOP + EscapeSequences.EMPTY +
-                EscapeSequences.BLACK_QUEEN + EscapeSequences.EMPTY + EscapeSequences.BLACK_KING + EscapeSequences.EMPTY + EscapeSequences.BLACK_BISHOP + EscapeSequences.EMPTY +
-                EscapeSequences.BLACK_KNIGHT + EscapeSequences.EMPTY + EscapeSequences.BLACK_ROOK + EscapeSequences.EMPTY + "\n");
+                " 8 " + EscapeSequences.SET_BG_COLOR_WHITE  + EscapeSequences.BLACK_ROOK  + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_KNIGHT + EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_BISHOP +
+                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_QUEEN + EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_KING + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_BISHOP +
+                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_KNIGHT + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_ROOK + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + "\n" +
+
+                " 7 " + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN +
+                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_PAWN +
+                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + "   " + "\n");
     }
 
     public String eval(String input) throws Exception {
