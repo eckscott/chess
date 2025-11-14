@@ -92,11 +92,11 @@ public class PostLogin {
         }
         ListGamesResponse response = server.listGames(ctx.getCurrUser());
         StringBuilder sb = new StringBuilder();
+        int i = 1;
         for (GameData game : response.games()) {
-            sb.append("Name: ").append(game.gameName())
-                    .append(", whitePlayer: ").append(game.whiteUsername())
-                    .append(", blackPlayer: ").append(game.blackUsername())
-                    .append("\n");
+            sb.append(String.format("%d. Name: %s, whitePlayer: %s, blackPlayer: %s%n",
+                            i, game.gameName(),game.whiteUsername(), game.blackUsername()));
+            i++;
         }
         return sb.toString();
     }
