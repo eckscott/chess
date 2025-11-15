@@ -7,9 +7,9 @@ import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.ListGamesResponse;
-import Exceptions.BadRequestException;
+import exceptions.BadRequestException;
 import service.GameService;
-import Exceptions.UnauthorizedException;
+import exceptions.UnauthorizedException;
 import service.UserService;
 
 public class Server {

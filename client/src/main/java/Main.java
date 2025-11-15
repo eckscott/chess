@@ -1,6 +1,6 @@
-import Exceptions.AlreadyTakenException;
-import Exceptions.BadRequestException;
-import Exceptions.UnauthorizedException;
+import exceptions.AlreadyTakenException;
+import exceptions.BadRequestException;
+import exceptions.UnauthorizedException;
 import client.ClientContext;
 import ui.EscapeSequences;
 import ui.InGame;

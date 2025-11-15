@@ -1,9 +1,9 @@
 package server;
 
-import Exceptions.AlreadyTakenException;
-import Exceptions.BadRequestException;
-import Exceptions.InvalidGameException;
-import Exceptions.UnauthorizedException;
+import exceptions.AlreadyTakenException;
+import exceptions.BadRequestException;
+import exceptions.InvalidGameException;
+import exceptions.UnauthorizedException;
 import com.google.gson.Gson;
 import model.*;
 

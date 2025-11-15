@@ -2,7 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
-import Exceptions.UnauthorizedException;
+import exceptions.UnauthorizedException;
 
 import java.util.Collection;
 import java.util.HashMap;
