@@ -70,7 +70,7 @@ public class PostLogin {
 
     private String logout(String... params) throws Exception {
         if (params.length != 0){
-            throw new Exception("Provided parameters and expected none");
+            throw new Exception(String.format("ERROR: Wanted 0 parameters and was provided %d\n", params.length));
         }
         server.logout(ctx.getCurrUser());
         ctx.setCurrState(States.SIGNEDOUT);
@@ -83,12 +83,12 @@ public class PostLogin {
             var createGameResult = server.createGame(ctx.getCurrUser(), createGameReq);
             return String.format("%s created successfully!\n", createGameResult.gameName());
         }
-        throw new Exception("Wrong amount of parameters provided");
+        throw new Exception(String.format("ERROR: Wanted 1 parameter <GAMENAME> and was provided %d\n", params.length));
     }
 
     private String listGames(String... params) throws Exception {
         if (params.length != 0){
-            throw new Exception("Provided parameters and expected none");
+            throw new Exception(String.format("ERROR: Wanted 0 parameters and was provided %d\n", params.length));
         }
         ListGamesResponse response = server.listGames(ctx.getCurrUser());
         StringBuilder sb = new StringBuilder();
@@ -122,7 +122,6 @@ public class PostLogin {
             }
             return "Couldn't join game";
         }
-        throw new Exception("Wrong amount of parameters provided\n");
+        throw new Exception(String.format("ERROR: Wanted 2 parameters <GAMEID> [WHITE|BLACK] and was provided %d\n", params.length));
     }
-
 }

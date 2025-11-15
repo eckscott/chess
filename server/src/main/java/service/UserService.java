@@ -1,12 +1,12 @@
 package service;
 
+import Exceptions.BadRequestException;
+import Exceptions.UnauthorizedException;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserService {

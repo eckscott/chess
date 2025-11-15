@@ -1,5 +1,8 @@
 package server;
 
+import Exceptions.AlreadyTakenException;
+import Exceptions.BadRequestException;
+import Exceptions.UnauthorizedException;
 import com.google.gson.Gson;
 import model.*;
 
@@ -38,15 +41,18 @@ public class ServerFacade {
         var req = buildReq("DELETE", "/session", null, authorization.authToken());
         var response = sendReq(req);
         if (response.statusCode() != 200){
-            throw new RuntimeException("Bad response: " + response.statusCode());
+            throw new UnauthorizedException("Make sure you are logged in before attempting to logout\n");
         }
     }
 
     public GameData createGame(AuthData authorization, GameData gameData){
         var req = buildReq("POST", "/game", gameData, authorization.authToken());
         var response = sendReq(req);
-        if (response.statusCode() != 200){
-            throw new RuntimeException("Bad response: " + response.statusCode());
+        if (response.statusCode() == 400){
+            throw new BadRequestException("Please provide a game name\n");
+        }
+        else if (response.statusCode() == 401){
+            throw new UnauthorizedException("Please make sure you are logged in before attempting to create a game\n");
         }
         var jsonResponse = response.body();
         return new Gson().fromJson(jsonResponse, GameData.class);
@@ -55,8 +61,8 @@ public class ServerFacade {
     public ListGamesResponse listGames(AuthData authorization){
         var req = buildReq("GET", "/game", null, authorization.authToken());
         var response = sendReq(req);
-        if (response.statusCode() != 200){
-            throw new RuntimeException("Bad response: " + response.statusCode());
+        if (response.statusCode() == 401){
+            throw new UnauthorizedException("Please make sure you are logged in before attempting to see games\n");
         }
         var jsonResponse = response.body();
         return new Gson().fromJson(jsonResponse, ListGamesResponse.class);
@@ -78,8 +84,14 @@ public class ServerFacade {
     public void joinGame(AuthData authorization, JoinGameData joinGameReq){
         var req = buildReq("PUT", "/game", joinGameReq, authorization.authToken());
         var response = sendReq(req);
-        if (response.statusCode() != 200){
-            throw new RuntimeException("Bad response: " + response.statusCode());
+        if (response.statusCode() == 400){
+            throw new BadRequestException("Please provide a valid game to join\n");
+        }
+        if (response.statusCode() == 401){
+            throw new UnauthorizedException("Please make sure you are logged in before attempting to join a game\n");
+        }
+        if (response.statusCode() == 403){
+            throw new AlreadyTakenException("Sorry! Somebody is already there. Please try joining a different position\n");
         }
     }
 
@@ -119,6 +131,16 @@ public class ServerFacade {
         if (response.statusCode() == 200){
             var jsonResponse = response.body();
             return new Gson().fromJson(jsonResponse, AuthData.class);
+        }
+        else if (response.statusCode() == 400){
+            throw new BadRequestException("Please try different inputs\n");
+        }
+        else if (response.statusCode() == 401){
+            throw new UnauthorizedException("Please make sure you are already registed and that" +
+                                            " your username and password are correct\n");
+        }
+        else if (response.statusCode() == 403){
+            throw new AlreadyTakenException("Sorry! That username is taken. Please provide unique credentials\n");
         }
         else {
             throw new RuntimeException("Bad response: " + response.statusCode());

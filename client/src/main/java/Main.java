@@ -1,4 +1,8 @@
+import Exceptions.AlreadyTakenException;
+import Exceptions.BadRequestException;
+import Exceptions.UnauthorizedException;
 import client.ClientContext;
+import ui.EscapeSequences;
 import ui.InGame;
 import ui.PostLogin;
 import ui.PreLogin;
@@ -14,26 +18,55 @@ public class Main {
         PostLogin postLogin = new PostLogin(port, ctx);
         InGame inGame = new InGame(port, ctx);
 
-        try{
-            while (currState != States.QUIT){
-                switch (currState){
-                    case SIGNEDOUT -> {
+
+        while (currState != States.QUIT){
+            switch (currState){
+                case SIGNEDOUT -> {
+                    try {
                         currState = preLogin.run();
                     }
-                    case SIGNEDIN -> {
-                        currState = postLogin.run();
+                    catch (BadRequestException e){
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Bad request -- %s%n", e.getMessage());
                     }
-                    case INGAME -> {
-                        currState = inGame.run();
+                    catch (UnauthorizedException e){
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Unauthorized -- %s%n", e.getMessage());
                     }
-                    default -> {
-                        currState = States.QUIT;
+                    catch (AlreadyTakenException e){
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + e.getMessage());
+                    }
+                    catch (Exception e){
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + e.getMessage());
                     }
                 }
+                case SIGNEDIN -> {
+                    try {
+                        currState = postLogin.run();
+                    }
+                    catch (BadRequestException e){
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Bad request -- %s%n", e.getMessage());
+                    }
+                    catch (UnauthorizedException e){
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Unauthorized -- %s%n", e.getMessage());
+                    }
+                    catch (AlreadyTakenException e) {
+                        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + e.getMessage());
+                    }
+                    catch (Exception e){
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + e.getMessage());
+                    }
+                }
+                case INGAME -> {
+                    try {
+                        currState = inGame.run();
+                    }
+                    catch (Exception e){
+                        System.out.print("Just a catch for now");
+                    }
+                }
+                default -> {
+                    currState = States.QUIT;
+                }
             }
-        }
-        catch (Exception e){
-            System.out.printf("Unable to start the server: %s%n", e.getMessage());
         }
     }
 }

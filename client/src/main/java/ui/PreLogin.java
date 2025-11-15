@@ -72,7 +72,7 @@ public class PreLogin {
             ctx.setCurrState(States.SIGNEDIN);
             return String.format("You have successfully registered and are now signed in as %s\n", auth.username());
         }
-        throw new Exception("Didn't work");
+        throw new Exception(String.format("ERROR: Wanted 3 parameters <USERNAME> <PASSWORD> <EMAIL> and was provided %d\n", params.length));
     }
 
     private String login(String... params) throws Exception{
@@ -84,6 +84,6 @@ public class PreLogin {
             ctx.setCurrState(States.SIGNEDIN);
             return String.format("You have successfully signed in as %s\n", auth.username());
         }
-        throw new Exception("Invalid input: expected <USERNAME> <PASSWORD>");
+        throw new Exception(String.format("ERROR: Wanted 2 parameters <USERNAME> <PASSWORD> and was provided %d\n", params.length));
     }
 }

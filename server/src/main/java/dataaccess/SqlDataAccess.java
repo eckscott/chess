@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import service.UnauthorizedException;
+import Exceptions.UnauthorizedException;
 
 public class SqlDataAccess implements DataAccess{
 

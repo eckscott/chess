@@ -1,7 +1,8 @@
 package service;
 
+import Exceptions.BadRequestException;
+import Exceptions.UnauthorizedException;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.GameData;
 import model.JoinGameData;

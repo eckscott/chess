@@ -2,20 +2,15 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import dataaccess.SqlDataAccess;
 import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.ListGamesResponse;
-import service.BadRequestException;
+import Exceptions.BadRequestException;
 import service.GameService;
-import service.UnauthorizedException;
+import Exceptions.UnauthorizedException;
 import service.UserService;
-
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class Server {
 
