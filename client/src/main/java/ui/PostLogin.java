@@ -52,6 +52,7 @@ public class PostLogin {
             case "creategame" -> createGame(params);
             case "listgames" -> listGames(params);
             case "playgame" -> playGame(params);
+            case "observegame" -> observeGame(params);
             default -> help();
         };
     }
@@ -123,5 +124,16 @@ public class PostLogin {
             return "Couldn't join game";
         }
         throw new Exception(String.format("ERROR: Wanted 2 parameters <GAMEID> [WHITE|BLACK] and was provided %d\n", params.length));
+    }
+
+    private String observeGame(String... params) throws Exception{
+        if (params.length == 1){
+            String gameIndex = params[0];
+            GameData gameToJoin = server.findGame(ctx.getCurrUser(), gameIndex);
+            ctx.setCurrState(States.INGAME);
+            ctx.setCurrRole(ChessGame.TeamColor.WHITE);
+            return String.format("Now observing game %s\n", gameIndex);
+        }
+        throw new Exception(String.format("ERROR: Wanted 1 parameters <GAMEID> and was provided %d\n", params.length));
     }
 }

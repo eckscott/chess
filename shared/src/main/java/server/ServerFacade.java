@@ -2,6 +2,7 @@ package server;
 
 import Exceptions.AlreadyTakenException;
 import Exceptions.BadRequestException;
+import Exceptions.InvalidGameException;
 import Exceptions.UnauthorizedException;
 import com.google.gson.Gson;
 import model.*;
@@ -70,7 +71,12 @@ public class ServerFacade {
 
     public GameData findGame(AuthData authorization, String gameIndexString){
         ListGamesResponse listOfGames = listGames(authorization);
-        int gameIndex = Integer.parseInt(gameIndexString);
+        int gameIndex;
+        try{
+            gameIndex = Integer.parseInt(gameIndexString);
+        } catch (NumberFormatException e){
+            throw new InvalidGameException("Game IDs must be numeric\n");
+        }
         int i = 0;
         for (GameData game : listOfGames.games()){
             if (i == gameIndex - 1){
@@ -78,7 +84,7 @@ public class ServerFacade {
             }
             i++;
         }
-        return null;
+        throw new InvalidGameException("That game does not exist! Please provide a different gameID\n");
     }
 
     public void joinGame(AuthData authorization, JoinGameData joinGameReq){
