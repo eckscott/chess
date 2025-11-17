@@ -1,6 +1,6 @@
 package ui;
 
-import chess.ChessGame;
+import chess.*;
 import client.ClientContext;
 import client.States;
 import model.*;
@@ -21,7 +21,7 @@ public class InGame {
 
     public States run() throws Exception {
         if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-            drawBoardWhite();
+            drawWhite(ctx.getCurrGame().getBoard());
         }
         else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
             drawBoardBlack();
@@ -198,6 +198,109 @@ public class InGame {
                 """;
     }
 
+    private void drawWhite(ChessBoard board) {
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                "   " + " a " + "  b  "  + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+
+        for (int i = 8; i >=1; i=i-2){
+            System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                    EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
+            drawPiece(board.getPiece(new ChessPosition(i, 1)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i, 2)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i, 3)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i, 4)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i, 5)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i, 6)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i, 7)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i, 8)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+            System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                    EscapeSequences.SET_BG_COLOR_RED, i - 1);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+        }
+
+    }
+
+    private void drawPiece(ChessPiece piece){
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            if (piece.getPieceType() == ChessPiece.PieceType.ROOK){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_ROOK);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_KNIGHT);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.BISHOP){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_BISHOP);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.QUEEN){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_QUEEN);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KING){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_KING);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_PAWN);
+            }
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            if (piece.getPieceType() == ChessPiece.PieceType.ROOK){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_ROOK);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KNIGHT);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.BISHOP){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_BISHOP);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.QUEEN){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_QUEEN);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KING){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING);
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN){
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN);
+            }
+        }
+    }
 
 }
 

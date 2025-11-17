@@ -80,7 +80,7 @@ public class PostLogin {
 
     private String createGame(String... params) throws Exception {
         if (params.length == 1){
-            var createGameReq = new GameData(0, null, null, params[0], null);
+            var createGameReq = new GameData(0, null, null, params[0], new ChessGame());
             var createGameResult = server.createGame(ctx.getCurrUser(), createGameReq);
             return String.format("%s created successfully!\n", createGameResult.gameName());
         }
@@ -112,6 +112,7 @@ public class PostLogin {
                 server.joinGame(ctx.getCurrUser(), joinReq);
                 ctx.setCurrState(States.INGAME);
                 ctx.setCurrRole(ChessGame.TeamColor.WHITE);
+                ctx.setCurrGame(server.findGame(ctx.getCurrUser(), gameIndex).game());
                 return String.format("Joined game %s as white player\n", gameIndex);
             }
             else if (teamColor.equals("black")){
@@ -119,6 +120,7 @@ public class PostLogin {
                 server.joinGame(ctx.getCurrUser(), joinReq);
                 ctx.setCurrState(States.INGAME);
                 ctx.setCurrRole(ChessGame.TeamColor.BLACK);
+                ctx.setCurrGame(server.findGame(ctx.getCurrUser(), gameIndex).game());
                 return String.format("Joined game %s as black player\n", gameIndex);
             }
             return "Couldn't join game";
@@ -132,6 +134,7 @@ public class PostLogin {
             GameData gameToJoin = server.findGame(ctx.getCurrUser(), gameIndex);
             ctx.setCurrState(States.INGAME);
             ctx.setCurrRole(ChessGame.TeamColor.WHITE);
+            ctx.setCurrGame(server.findGame(ctx.getCurrUser(), gameIndex).game());
             return String.format("Now observing game %s\n", gameIndex);
         }
         throw new Exception(String.format("ERROR: Wanted 1 parameters <GAMEID> and was provided %d\n", params.length));
