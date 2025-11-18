@@ -20,7 +20,7 @@ public class PostLogin {
     }
 
     public States run() throws Exception {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "type <help> for options");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Type <help> for options");
 
         Scanner scanner = new Scanner(System.in);
         var result = "";

@@ -1,7 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import dataaccess.MemoryDataAccess;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -9,7 +8,6 @@ import server.ServerFacade;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

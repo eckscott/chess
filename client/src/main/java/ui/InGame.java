@@ -55,6 +55,10 @@ public class InGame {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd){
             case "quit" -> "quit";
+            case "leave" -> {
+                ctx.setCurrState(States.SIGNEDIN);
+                yield "You've exited the game! ";
+            }
             default -> help();
         };
     }
@@ -62,6 +66,11 @@ public class InGame {
     public String help() {
         return """
                 help - lists command options
+                RedrawChessBoard - Redraws the chess board
+                Leave - Leave the game without resigning
+                MakeMove <[start, position]>, <[end, position]> - Moves a piece from start position to end position
+                Resign - Forfeit the game and the game is over
+                HighlightLegalMoves <[start, position]> - highlight legal moves for the piece at the indicated position
                 quit - exits the program
                 """;
     }
