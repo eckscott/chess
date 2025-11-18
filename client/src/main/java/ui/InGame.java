@@ -24,7 +24,7 @@ public class InGame {
             drawWhite(ctx.getCurrGame().getBoard());
         }
         else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-            drawBoardBlack();
+            drawBlack(ctx.getCurrGame().getBoard());
         }
 
 
@@ -48,138 +48,6 @@ public class InGame {
         System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
-    private void drawBoardWhite() {
-        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                "   " + " a " + "  b  "  + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 8 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY  + EscapeSequences.BLACK_ROOK  +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_KNIGHT + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_BISHOP + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_QUEEN +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_KING + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.BLACK_BISHOP + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_KNIGHT +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_ROOK + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 7 " + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_PAWN +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY+
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 6 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY  + EscapeSequences.EMPTY  +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 5 " + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 4 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY  + EscapeSequences.EMPTY  +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 3 " + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + " 2 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY  + EscapeSequences.SET_TEXT_COLOR_WHITE +
-                EscapeSequences.WHITE_PAWN  + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY+
-                EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY+
-                EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY+
-                EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_WHITE +
-                "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 1 " + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.WHITE_KNIGHT + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_BISHOP +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_QUEEN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_KING+
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_BISHOP + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.WHITE_KNIGHT + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_ROOK +
-                EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-    }
-
-    private void drawBoardBlack() {
-        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 1 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.WHITE_KNIGHT + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_BISHOP +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_KING + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_QUEEN+
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_BISHOP + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.WHITE_KNIGHT + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_ROOK +
-                EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 2 " + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_PAWN +EscapeSequences.SET_BG_COLOR_LIGHT_GREY+EscapeSequences.WHITE_PAWN+
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_PAWN +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_PAWN +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.WHITE_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.WHITE_PAWN +
-                EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 3 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 4 " + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY  + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 5 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE +
-                "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 6 " + EscapeSequences.SET_BG_COLOR_RED  +
-                EscapeSequences.EMPTY  + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.EMPTY + EscapeSequences.SET_BG_COLOR_WHITE + "   " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 7 " + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_PAWN + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_PAWN +
-                EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " 8 " + EscapeSequences.SET_BG_COLOR_RED +
-                EscapeSequences.BLACK_ROOK  + EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_KNIGHT +
-                EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_BISHOP + EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                EscapeSequences.BLACK_KING + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_QUEEN + EscapeSequences.SET_BG_COLOR_LIGHT_GREY+
-                EscapeSequences.BLACK_BISHOP + EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.BLACK_KNIGHT +
-                EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.BLACK_ROOK + EscapeSequences.SET_BG_COLOR_WHITE +
-                "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n" +
-
-                EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                        "   " + " h " + "  g  "  + " f " + " e " + "  d " + " c " + "  b " + "  a  " + "  " +
-                EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-    }
 
     public String eval(String input) throws Exception {
         String[] tokens = input.toLowerCase().split(" ");
@@ -205,57 +73,283 @@ public class InGame {
         for (int i = 8; i >=1; i=i-2){
             System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
                     EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
-            drawPiece(board.getPiece(new ChessPosition(i, 1)));
+            if (board.getPiece(new ChessPosition(i, 1)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 1)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i, 2)));
+            if (board.getPiece(new ChessPosition(i, 2)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 2)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i, 3)));
+            if (board.getPiece(new ChessPosition(i, 3)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 3)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i, 4)));
+            if (board.getPiece(new ChessPosition(i, 4)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 4)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i, 5)));
+            if (board.getPiece(new ChessPosition(i, 5)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 5)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i, 6)));
+            if (board.getPiece(new ChessPosition(i, 6)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 6)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i, 7)));
+            if (board.getPiece(new ChessPosition(i, 7)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 7)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i, 8)));
+            if (board.getPiece(new ChessPosition(i, 8)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 8)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
             System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
                     EscapeSequences.SET_BG_COLOR_RED, i - 1);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
+            if (board.getPiece(new ChessPosition(i - 1, 1)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
+            if (board.getPiece(new ChessPosition(i - 1, 2)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
+            if (board.getPiece(new ChessPosition(i - 1, 3)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
+            if (board.getPiece(new ChessPosition(i - 1, 4)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
+            if (board.getPiece(new ChessPosition(i - 1, 5)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
+            if (board.getPiece(new ChessPosition(i - 1, 6)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
+            if (board.getPiece(new ChessPosition(i - 1, 7)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
+            if (board.getPiece(new ChessPosition(i - 1, 8)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
 
             System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
         }
+
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+    }
+
+    private void drawBlack(ChessBoard board){
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                "   " + " h " + "  g  "  + " f " + " e " + "  d " + " c " + "  b " + "  a  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+
+        for (int i = 1; i <=8; i=i+2){
+            System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                    EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
+            if (board.getPiece(new ChessPosition(i, 8)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 8)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i, 7)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 7)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i, 6)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 6)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i, 5)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 5)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i, 4)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 4)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i, 3)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 3)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i, 2)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 2)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i, 1)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i, 1)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+            System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                    EscapeSequences.SET_BG_COLOR_RED, i + 1);
+            if (board.getPiece(new ChessPosition(i + 1, 8)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 8)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i + 1, 7)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 7)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i + 1, 6)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 6)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i + 1, 5)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 5)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i + 1, 4)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 4)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i + 1, 3)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 3)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+            if (board.getPiece(new ChessPosition(i + 1, 2)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 2)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            if (board.getPiece(new ChessPosition(i + 1, 1)) != null) {
+                drawPiece(board.getPiece(new ChessPosition(i + 1, 1)));
+            }
+            else{
+                System.out.print(EscapeSequences.EMPTY);
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+        }
+
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
 
     }
 
