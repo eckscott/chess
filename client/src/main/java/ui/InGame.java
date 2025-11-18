@@ -59,6 +59,15 @@ public class InGame {
                 ctx.setCurrState(States.SIGNEDIN);
                 yield "You've exited the game! ";
             }
+            case "redrawchessboard" -> {
+                if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
+                    drawWhite(ctx.getCurrGame().getBoard());
+                }
+                else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
+                    drawBlack(ctx.getCurrGame().getBoard());
+                }
+                yield "Current board ^^^\n";
+            }
             default -> help();
         };
     }
