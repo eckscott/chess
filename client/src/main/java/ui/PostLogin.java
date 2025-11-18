@@ -95,9 +95,12 @@ public class PostLogin {
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (GameData game : response.games()) {
-            sb.append(String.format("%d. Name: %s, whitePlayer: %s, blackPlayer: %s%n, game: %s%n",
-                            i, game.gameName(),game.whiteUsername(), game.blackUsername(), game.game()));
+            sb.append(String.format("%d. Name: %s, whitePlayer: %s, blackPlayer: %s%n",
+                            i, game.gameName(),game.whiteUsername(), game.blackUsername()));
             i++;
+        }
+        if (response.games().isEmpty()){
+            return "There are no games! Feel free to create one with the 'creategame' method\n";
         }
         return sb.toString();
     }
