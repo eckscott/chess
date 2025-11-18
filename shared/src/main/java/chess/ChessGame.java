@@ -119,7 +119,7 @@ public class ChessGame {
                 if (board.getPiece(enemyPos) != null && board.getPiece(enemyPos).getTeamColor() != teamColor) {
                     ChessPiece piece = board.getPiece(enemyPos);
                     Collection<ChessMove> enemyPieceMoves = piece.pieceMoves(board, enemyPos);
-                    ChessPosition king = finder.find(teamColor, ChessPiece.PieceType.KING);
+                    ChessPosition king = find(teamColor, ChessPiece.PieceType.KING);
                     if (endPositions(enemyPieceMoves).contains(king)) {
                         return true;
                     }
@@ -208,7 +208,7 @@ public class ChessGame {
     /**
      * Find any piece on the board
      */
-    PieceFinder finder = (teamColor, pieceType) -> {
+    public ChessPosition find(TeamColor teamColor, ChessPiece.PieceType pieceType) {
         for (int r = 1; r <= 8; r++){
             for (int c = 1; c <= 8; c++){
                 ChessPosition piecePos = new ChessPosition(r, c);

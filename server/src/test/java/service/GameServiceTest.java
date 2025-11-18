@@ -35,7 +35,7 @@ class GameServiceTest {
         user = new UserData("joe", "j@jmail.com", "123");
         auth = userService.register(user);
 
-        createGameData = new GameData(0, null, null, "gameName", null);
+        createGameData = new GameData(0, null, null, "gameName", new ChessGame());
     }
 
     @Test

@@ -95,8 +95,8 @@ public class PostLogin {
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (GameData game : response.games()) {
-            sb.append(String.format("%d. Name: %s, whitePlayer: %s, blackPlayer: %s%n",
-                            i, game.gameName(),game.whiteUsername(), game.blackUsername()));
+            sb.append(String.format("%d. Name: %s, whitePlayer: %s, blackPlayer: %s%n, game: %s%n",
+                            i, game.gameName(),game.whiteUsername(), game.blackUsername(), game.game()));
             i++;
         }
         return sb.toString();

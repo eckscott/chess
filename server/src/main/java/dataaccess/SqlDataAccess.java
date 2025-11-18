@@ -116,8 +116,9 @@ public class SqlDataAccess implements DataAccess{
     @Override
     public void createGame(GameData gameData) throws DataAccessException {
         try{
-            var statement = "INSERT INTO games (gameID, gameName) VALUES (?, ?)";
-            HELPER_METHODS.executeUpdate(statement, gameData.gameID(), gameData.gameName());
+            var statement = "INSERT INTO games (gameID, gameName, game) VALUES (?, ?, ?)";
+            String gameString = new Gson().toJson(gameData.game());
+            HELPER_METHODS.executeUpdate(statement, gameData.gameID(), gameData.gameName(), gameString);
         } catch (DataAccessException e) {
             throw new DataAccessException(String.format("Unable to create game in database: %s", e.getMessage()));
         }

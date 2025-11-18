@@ -29,7 +29,7 @@ public class GameService {
         }
 
         int gameID = generateGameID();
-        GameData createGameData = new GameData(gameID, null, null, createGameRequest.gameName(), null);
+        GameData createGameData = new GameData(gameID, null, null, createGameRequest.gameName(), createGameRequest.game());
         dataAccess.createGame(createGameData);
 
         return createGameData;

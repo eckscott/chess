@@ -1,7 +1,7 @@
 package dataaccess;
 
-import model.AuthData;
-import model.UserData;
+import chess.ChessGame;
+import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,7 +95,11 @@ class DataAccessTest {
 
     @Test
     @DisplayName("Good createGame")
-    void createGame() {
+    void createGame() throws DataAccessException {
+        db.createUser(user);
+        GameData createGameReq = new GameData(100, null, null, "gameName", new ChessGame());
+        db.createGame(createGameReq);
+        assertNotNull(db.getGame(100).game());
 
     }
 
