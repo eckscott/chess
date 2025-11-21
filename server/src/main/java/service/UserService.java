@@ -76,4 +76,8 @@ public class UserService {
         var storedHashedPass = dataAccess.getUser(username).password();
         return BCrypt.checkpw(providedClearTextPass, storedHashedPass);
     }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        return dataAccess.getAuth(authToken);
+    }
 }

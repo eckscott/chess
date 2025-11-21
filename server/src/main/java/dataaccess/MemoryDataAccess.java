@@ -30,7 +30,6 @@ public class MemoryDataAccess implements DataAccess {
         return users.get(username);
     }
 
-
     @Override
     public void createAuth(AuthData authorization){
         auth.put(authorization.authToken(), authorization.username());

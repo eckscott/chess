@@ -11,16 +11,21 @@ import io.javalin.http.Context;
 import model.ListGamesResponse;
 import exceptions.BadRequestException;
 import org.eclipse.jetty.websocket.api.Session;
+import server.websockets.ConnectionManager;
 import service.GameService;
 import exceptions.UnauthorizedException;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
+
+import java.io.IOException;
 
 public class Server {
 
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
+    private final ConnectionManager connections = new ConnectionManager();
 
     public Server() {
         //var dataAccess = new MemoryDataAccess();
@@ -203,14 +208,22 @@ public class Server {
     }
 
     private void wsMessage(WsMessageContext ctx){
-        UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-        switch (cmd.getCommandType()){
-            case CONNECT -> playerJoin(cmd.getAuthToken(), ctx.session);
+        try {
+            UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            switch (cmd.getCommandType()){
+                case CONNECT -> playerJoin(cmd.getAuthToken(), ctx.session);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void playerJoin(String authToken, Session session){
-
+    private void playerJoin(String authToken, Session session) throws DataAccessException, IOException {
+        connections.add(session);
+        var message = String.format("%s has joined the game", userService.getUsername(authToken));
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        notification.setServerMessageContent(message);
+        connections.broadcast(session, notification);
     }
 
     public int run(int desiredPort) {
