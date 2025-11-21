@@ -3,14 +3,18 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlDataAccess;
+import io.javalin.websocket.WsConnectContext;
+import io.javalin.websocket.WsMessageContext;
 import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.ListGamesResponse;
 import exceptions.BadRequestException;
+import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import exceptions.UnauthorizedException;
 import service.UserService;
+import websocket.commands.UserGameCommand;
 
 public class Server {
 
@@ -38,6 +42,11 @@ public class Server {
             server.post("game", ctx -> createGame(ctx));
             server.get("game", ctx -> listGames(ctx));
             server.put("game", ctx -> joinGame(ctx));
+
+            // websockets
+            server.ws("/ws", ws -> ws.onConnect(ctx -> connect(ctx)));
+            server.ws("/ws", ws -> ws.onMessage(ctx -> wsMessage(ctx)));
+
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -186,6 +195,22 @@ public class Server {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(403).result(msg);
         }
+    }
+
+    private void connect(WsConnectContext ctx){
+        System.out.println("Websocket connected");
+        ctx.enableAutomaticPings();
+    }
+
+    private void wsMessage(WsMessageContext ctx){
+        UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+        switch (cmd.getCommandType()){
+            case CONNECT -> playerJoin(cmd.getAuthToken(), ctx.session);
+        }
+    }
+
+    private void playerJoin(String authToken, Session session){
+
     }
 
     public int run(int desiredPort) {
