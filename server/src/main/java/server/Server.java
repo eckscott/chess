@@ -3,35 +3,26 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlDataAccess;
-import io.javalin.websocket.WsConnectContext;
-import io.javalin.websocket.WsMessageContext;
 import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.ListGamesResponse;
 import exceptions.BadRequestException;
-import org.eclipse.jetty.websocket.api.Session;
-import server.websockets.ConnectionManager;
+import server.websockets.WebSocketHandler;
 import service.GameService;
 import exceptions.UnauthorizedException;
 import service.UserService;
-import websocket.commands.UserGameCommand;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class Server {
 
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
-    private final ConnectionManager connections = new ConnectionManager();
+    private final WebSocketHandler wsHandler;
 
     public Server() {
         //var dataAccess = new MemoryDataAccess();
+        wsHandler = new WebSocketHandler();
         try {
             var dataAccess = new SqlDataAccess();
             userService = new UserService(dataAccess);
@@ -52,13 +43,13 @@ public class Server {
             server.put("game", ctx -> joinGame(ctx));
 
             // websockets
-            server.ws("/ws", ws -> ws.onConnect(ctx -> connect(ctx)));
-            server.ws("/ws", ws -> ws.onMessage(ctx -> wsMessage(ctx)));
-
+            server.ws("/ws", ws -> {
+                ws.onConnect(wsHandler);
+                ws.onMessage(wsHandler);
+            });
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void clear(Context ctx){
@@ -203,47 +194,6 @@ public class Server {
             var msg = String.format("{ \"message\": \"Error: %s\" }", e.getMessage());
             ctx.status(403).result(msg);
         }
-    }
-
-    private void connect(WsConnectContext ctx){
-        System.out.println("Websocket connected");
-        ctx.enableAutomaticPings();
-    }
-
-    private void wsMessage(WsMessageContext ctx){
-        try {
-            UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-            switch (cmd.getCommandType()){
-                case CONNECT -> playerJoin(cmd, ctx.session);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void playerJoin(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
-        if (connections.contains(cmd.getGameID())){
-            Collection<Session> connectedUsers = connections.alreadyConnected(cmd.getGameID());
-            connectedUsers.add(session);
-            connections.add(cmd.getGameID(), connectedUsers);
-        }
-        else {
-            Collection<Session> connectedUsers = new ArrayList<>();
-            connectedUsers.add(session);
-            connections.add(cmd.getGameID(), connectedUsers);
-        }
-        String message;
-        if (gameService.getGame(cmd.getGameID()).blackUsername().equals(userService.getUsername(cmd.getAuthToken()))){
-            message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
-        }
-        else if (gameService.getGame(cmd.getGameID()).whiteUsername().equals(userService.getUsername(cmd.getAuthToken()))){
-            message = String.format("%s has joined the game as white", userService.getUsername(cmd.getAuthToken()));
-        }
-        else {
-            message = String.format("%s has joined the game as a spectator", userService.getUsername(cmd.getAuthToken()));
-        }
-        var notificationMsg = new NotificationMessage(message);
-        connections.broadcast(session, notificationMsg, cmd.getGameID());
     }
 
     public int run(int desiredPort) {
