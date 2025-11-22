@@ -17,22 +17,12 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    private String serverMessageContent;
-
     public ServerMessage(ServerMessageType type) {
         this.serverMessageType = type;
     }
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
-    }
-
-    public void setServerMessageContent(String serverMessageContent) {
-        this.serverMessageContent = serverMessageContent;
-    }
-
-    public String getServerMessageContent(ServerMessage msg){
-        return msg.serverMessageContent;
     }
 
     @Override

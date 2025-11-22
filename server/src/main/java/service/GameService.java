@@ -55,6 +55,10 @@ public class GameService {
         dataAccess.joinGame(authToken, joinGameReq);
     }
 
+    public GameData getGame(int gameID) throws DataAccessException {
+        return dataAccess.getGame(gameID);
+    }
+
     public int generateGameID(){
         Random randNum = new Random();
         return randNum.nextInt(1, 1000);

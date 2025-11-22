@@ -16,9 +16,12 @@ import service.GameService;
 import exceptions.UnauthorizedException;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Server {
 
@@ -211,19 +214,36 @@ public class Server {
         try {
             UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (cmd.getCommandType()){
-                case CONNECT -> playerJoin(cmd.getAuthToken(), ctx.session);
+                case CONNECT -> playerJoin(cmd, ctx.session);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void playerJoin(String authToken, Session session) throws DataAccessException, IOException {
-        connections.add(session);
-        var message = String.format("%s has joined the game", userService.getUsername(authToken));
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        notification.setServerMessageContent(message);
-        connections.broadcast(session, notification);
+    private void playerJoin(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
+        if (connections.contains(cmd.getGameID())){
+            Collection<Session> connectedUsers = connections.alreadyConnected(cmd.getGameID());
+            connectedUsers.add(session);
+            connections.add(cmd.getGameID(), connectedUsers);
+        }
+        else {
+            Collection<Session> connectedUsers = new ArrayList<>();
+            connectedUsers.add(session);
+            connections.add(cmd.getGameID(), connectedUsers);
+        }
+        String message;
+        if (gameService.getGame(cmd.getGameID()).blackUsername().equals(userService.getUsername(cmd.getAuthToken()))){
+            message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
+        }
+        else if (gameService.getGame(cmd.getGameID()).whiteUsername().equals(userService.getUsername(cmd.getAuthToken()))){
+            message = String.format("%s has joined the game as white", userService.getUsername(cmd.getAuthToken()));
+        }
+        else {
+            message = String.format("%s has joined the game as a spectator", userService.getUsername(cmd.getAuthToken()));
+        }
+        var notificationMsg = new NotificationMessage(message);
+        connections.broadcast(session, notificationMsg, cmd.getGameID());
     }
 
     public int run(int desiredPort) {
