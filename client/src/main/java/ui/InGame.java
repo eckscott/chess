@@ -5,26 +5,31 @@ import client.ClientContext;
 import client.States;
 import model.*;
 import server.ServerFacade;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class InGame {
+public class InGame implements NotificationHandler {
 
     private final ServerFacade server;
+    private final WebSocketFacade ws;
     private final ClientContext ctx;
 
     public InGame(int port, ClientContext ctx) {
         server = new ServerFacade(port);
+        ws = new WebSocketFacade(port, this);
         this.ctx = ctx;
     }
 
     public States run() throws Exception {
         if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-            drawWhite(ctx.getCurrGame().getBoard());
+            drawWhite(ctx.getCurrGame().game().getBoard());
         }
         else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-            drawBlack(ctx.getCurrGame().getBoard());
+            drawBlack(ctx.getCurrGame().game().getBoard());
         }
 
 
@@ -61,10 +66,10 @@ public class InGame {
             }
             case "redrawchessboard" -> {
                 if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-                    drawWhite(ctx.getCurrGame().getBoard());
+                    drawWhite(ctx.getCurrGame().game().getBoard());
                 }
                 else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-                    drawBlack(ctx.getCurrGame().getBoard());
+                    drawBlack(ctx.getCurrGame().game().getBoard());
                 }
                 yield "Current board ^^^\n";
             }
@@ -414,5 +419,9 @@ public class InGame {
         }
     }
 
+    @Override
+    public void notify(ServerMessage cmd) {
+
+    }
 }
 

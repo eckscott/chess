@@ -8,7 +8,7 @@ public class ClientContext {
     private AuthData currUser;
     private States currState;
     private ChessGame.TeamColor currRole;
-    private ChessGame currGame;
+    private GameData currGame;
 
     public AuthData getCurrUser() {
         return currUser;
@@ -34,9 +34,9 @@ public class ClientContext {
         currRole = teamColor;
     }
 
-    public ChessGame getCurrGame() {return currGame;}
+    public GameData getCurrGame() {return currGame;}
 
-    public void setCurrGame(ChessGame game){
+    public void setCurrGame(GameData game){
         currGame = game;
     }
 }
