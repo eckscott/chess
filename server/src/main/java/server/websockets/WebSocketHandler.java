@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
@@ -75,6 +76,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             message = String.format("%s has joined the game as a spectator", userService.getUsername(cmd.getAuthToken()));
         }
         var notificationMsg = new NotificationMessage(message);
+        var loadGameMsg = new LoadGameMessage(gameService.getGame(cmd.getGameID()).game());
+        connections.broadcast(session, loadGameMsg, cmd.getGameID());
         connections.broadcast(session, notificationMsg, cmd.getGameID());
     }
 

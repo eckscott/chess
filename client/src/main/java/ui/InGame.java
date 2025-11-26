@@ -26,8 +26,6 @@ public class InGame implements NotificationHandler {
     }
 
     public States run() throws Exception {
-        ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
-
         if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
             drawWhite(ctx.getCurrGame().game().getBoard());
         }
@@ -35,6 +33,7 @@ public class InGame implements NotificationHandler {
             drawBlack(ctx.getCurrGame().game().getBoard());
         }
 
+        ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
