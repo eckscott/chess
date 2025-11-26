@@ -7,6 +7,7 @@ import model.*;
 import server.ServerFacade;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
@@ -25,6 +26,8 @@ public class InGame implements NotificationHandler {
     }
 
     public States run() throws Exception {
+        ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
+
         if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
             drawWhite(ctx.getCurrGame().game().getBoard());
         }
@@ -420,8 +423,8 @@ public class InGame implements NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage cmd) {
-
+    public void notify(NotificationMessage message) {
+        System.out.print(message.getMessage());
     }
 }
 
