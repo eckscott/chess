@@ -71,6 +71,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             message = "ERROR that game does not exist";
             connections.sendToSelf(session, new ErrorMessage(message), cmd.getGameID());
         }
+        else if (userService.getUsername(cmd.getAuthToken()) == null){
+            message = "ERROR that user is not authorized";
+            connections.sendToSelf(session, new ErrorMessage(message), cmd.getGameID());
+        }
         else {
             if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())) {
                 message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
