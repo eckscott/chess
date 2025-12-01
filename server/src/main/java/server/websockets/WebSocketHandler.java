@@ -92,7 +92,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void playerLeave(UserGameCommand cmd, Session session) throws DataAccessException {
+    private void playerLeave(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
         String message = String.format("%s has left the game", userService.getUsername(cmd.getAuthToken()));
+        connections.broadcast(session, new NotificationMessage(message), cmd.getGameID());
+        gameService.leaveGame(cmd.getAuthToken(), gameService.getGame(cmd.getGameID()));
+        connections.remove(session);
     }
 }

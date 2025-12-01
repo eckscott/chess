@@ -57,7 +57,7 @@ public class GameService {
     }
 
     public void leaveGame(String authToken, GameData game) {
-
+        dataAccess.removePlayer(authToken, game);
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
