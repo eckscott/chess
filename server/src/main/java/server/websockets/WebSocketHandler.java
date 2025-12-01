@@ -44,6 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (cmd.getCommandType()){
                 case CONNECT -> playerJoin(cmd, ctx.session);
+                case LEAVE -> playerLeave(cmd, ctx.session);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -66,6 +67,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connectedUsers.add(session);
             connections.add(cmd.getGameID(), connectedUsers);
         }
+
         String message;
         if (gameService.getGame(cmd.getGameID()) == null){
             message = "ERROR that game does not exist";
@@ -90,4 +92,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
+    private void playerLeave(UserGameCommand cmd, Session session) throws DataAccessException {
+        String message = String.format("%s has left the game", userService.getUsername(cmd.getAuthToken()));
+    }
 }

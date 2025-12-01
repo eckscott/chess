@@ -56,6 +56,10 @@ public class GameService {
         dataAccess.joinGame(authToken, joinGameReq);
     }
 
+    public void leaveGame(String authToken, GameData game) {
+
+    }
+
     public GameData getGame(int gameID) throws DataAccessException {
         return dataAccess.getGame(gameID);
     }

@@ -190,5 +190,21 @@ public class SqlDataAccess implements DataAccess{
         }
     }
 
+    @Override
+    public void removePlayer(String authToken, GameData game) {
+        try {
+            if (getGame(game.gameID()).whiteUsername().equals(getAuth(authToken))){
+                var statement = "UPDATE games SET whiteUsername = (?) WHERE gameID = (?)";
+                HELPER_METHODS.executeUpdate(statement, null, game.gameID());
+            }
+            else if (getGame(game.gameID()).blackUsername().equals(getAuth(authToken))){
+                var statement = "UPDATE games SET blackUsername = (?) WHERE gameID = (?)";
+                HELPER_METHODS.executeUpdate(statement, null, game.gameID());
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
 

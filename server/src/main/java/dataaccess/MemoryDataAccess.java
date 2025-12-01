@@ -97,4 +97,18 @@ public class MemoryDataAccess implements DataAccess {
             }
         }
     }
+
+    @Override
+    public void removePlayer(String authToken, GameData game) {
+        if (games.get(game.gameID()).blackUsername().equals(auth.get(authToken))) {
+            GameData updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            games.remove(game.gameID());
+            games.put(updatedGame.gameID(), updatedGame);
+        }
+        else if (games.get(game.gameID()).whiteUsername().equals(auth.get(authToken))){
+            GameData updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+            games.remove(game.gameID());
+            games.put(updatedGame.gameID(), updatedGame);
+        }
+    }
 }
