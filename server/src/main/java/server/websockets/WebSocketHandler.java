@@ -66,6 +66,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.add(cmd.getGameID(), connectedUsers);
         }
         String message;
+        if (gameService.getGame(cmd.getGameID()) == null){
+
+        }
         if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
         }
