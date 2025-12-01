@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
@@ -67,21 +68,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         String message;
         if (gameService.getGame(cmd.getGameID()) == null){
-
-        }
-        if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
-            message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
-        }
-        else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername())){
-            message = String.format("%s has joined the game as white", userService.getUsername(cmd.getAuthToken()));
+            message = "ERROR that game does not exist";
+            connections.sendToSelf(session, new ErrorMessage(message), cmd.getGameID());
         }
         else {
-            message = String.format("%s has joined the game as a spectator", userService.getUsername(cmd.getAuthToken()));
+            if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())) {
+                message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
+            } else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername())) {
+                message = String.format("%s has joined the game as white", userService.getUsername(cmd.getAuthToken()));
+            } else {
+                message = String.format("%s has joined the game as a spectator", userService.getUsername(cmd.getAuthToken()));
+            }
+            var notificationMsg = new NotificationMessage(message);
+            var loadGameMsg = new LoadGameMessage(gameService.getGame(cmd.getGameID()).game());
+            connections.sendToSelf(session, loadGameMsg, cmd.getGameID());
+            connections.broadcast(session, notificationMsg, cmd.getGameID());
         }
-        var notificationMsg = new NotificationMessage(message);
-        var loadGameMsg = new LoadGameMessage(gameService.getGame(cmd.getGameID()).game());
-        connections.sendToSelf(session, loadGameMsg, cmd.getGameID());
-        connections.broadcast(session, notificationMsg, cmd.getGameID());
     }
 
 }
