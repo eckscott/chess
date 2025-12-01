@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import exceptions.BadRequestException;
 import exceptions.UnauthorizedException;
 import dataaccess.DataAccessException;
@@ -29,7 +30,7 @@ public class GameService {
         }
 
         int gameID = generateGameID();
-        GameData createGameData = new GameData(gameID, null, null, createGameRequest.gameName(), createGameRequest.game());
+        GameData createGameData = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
         dataAccess.createGame(createGameData);
 
         return createGameData;

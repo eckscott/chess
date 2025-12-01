@@ -1,5 +1,6 @@
 package server.websockets;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -32,6 +33,18 @@ public class ConnectionManager {
         for (Session c : connectedSessions) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {
+                    c.getRemote().sendString(msg);
+                }
+            }
+        }
+    }
+
+    public void sendToSelf(Session rootSession, ServerMessage notification, int gameID) throws IOException {
+        Collection<Session> connectedSessions = connections.get(gameID);
+        String msg = new Gson().toJson(notification);
+        for (Session c : connectedSessions) {
+            if (c.isOpen()) {
+                if (c.equals(rootSession)) {
                     c.getRemote().sendString(msg);
                 }
             }

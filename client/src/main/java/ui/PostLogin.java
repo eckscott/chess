@@ -80,7 +80,7 @@ public class PostLogin {
 
     private String createGame(String... params) throws Exception {
         if (params.length == 1){
-            var createGameReq = new GameData(0, null, null, params[0], new ChessGame());
+            var createGameReq = new GameData(0, null, null, params[0], null);
             var createGameResult = server.createGame(ctx.getCurrUser(), createGameReq);
             return String.format("%s created successfully!\n", createGameResult.gameName());
         }

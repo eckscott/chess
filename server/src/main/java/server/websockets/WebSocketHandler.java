@@ -66,10 +66,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.add(cmd.getGameID(), connectedUsers);
         }
         String message;
-        if (gameService.getGame(cmd.getGameID()).blackUsername().equals(userService.getUsername(cmd.getAuthToken()))){
+        if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             message = String.format("%s has joined the game as black", userService.getUsername(cmd.getAuthToken()));
         }
-        else if (gameService.getGame(cmd.getGameID()).whiteUsername().equals(userService.getUsername(cmd.getAuthToken()))){
+        else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername())){
             message = String.format("%s has joined the game as white", userService.getUsername(cmd.getAuthToken()));
         }
         else {
@@ -77,7 +77,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         var notificationMsg = new NotificationMessage(message);
         var loadGameMsg = new LoadGameMessage(gameService.getGame(cmd.getGameID()).game());
-        connections.broadcast(session, loadGameMsg, cmd.getGameID());
+        connections.sendToSelf(session, loadGameMsg, cmd.getGameID());
         connections.broadcast(session, notificationMsg, cmd.getGameID());
     }
 
