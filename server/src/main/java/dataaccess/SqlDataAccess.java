@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.*;
 
@@ -203,6 +205,32 @@ public class SqlDataAccess implements DataAccess{
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateGame(int gameID, ChessMove move) throws InvalidMoveException, DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()){
+            ChessGame game = new ChessGame();
+            var statement = "SELECT * FROM games WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        var returnedID = rs.getInt("gameID");
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var gameName = rs.getString("gameName");
+                        var gameJson = rs.getString("game");
+                        game = new Gson().fromJson(gameJson, ChessGame.class);
+                    }
+                }
+            }
+            game.makeMove(move);
+            var newStatement = "UPDATE games SET game = (?) WHERE gameID = (?)";
+            HELPER_METHODS.executeUpdate(newStatement, game, gameID);
+        } catch (DataAccessException | SQLException e) {
+            throw new DataAccessException(String.format("Unable to get auth from database: %s", e.getMessage()));
         }
     }
 
