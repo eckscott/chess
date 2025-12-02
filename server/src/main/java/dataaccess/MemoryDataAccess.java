@@ -1,6 +1,6 @@
 package dataaccess;
 
-import chess.ChessGame;
+import chess.*;
 import model.*;
 import exceptions.UnauthorizedException;
 
@@ -110,5 +110,13 @@ public class MemoryDataAccess implements DataAccess {
             games.remove(game.gameID());
             games.put(updatedGame.gameID(), updatedGame);
         }
+    }
+
+    @Override
+    public void updateGame(int gameID, ChessMove move) throws InvalidMoveException {
+        GameData updatedGame = games.get(gameID);
+        updatedGame.game().makeMove(move);
+        games.remove(gameID);
+        games.put(gameID, updatedGame);
     }
 }

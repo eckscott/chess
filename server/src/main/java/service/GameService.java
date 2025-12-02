@@ -1,6 +1,6 @@
 package service;
 
-import chess.ChessGame;
+import chess.*;
 import exceptions.BadRequestException;
 import exceptions.UnauthorizedException;
 import dataaccess.DataAccessException;
@@ -62,6 +62,13 @@ public class GameService {
 
     public GameData getGame(int gameID) throws DataAccessException {
         return dataAccess.getGame(gameID);
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) throws DataAccessException, InvalidMoveException {
+        if (authToken == null || dataAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("unauthorized");
+        }
+        dataAccess.updateGame(gameID, move);
     }
 
     public int generateGameID(){

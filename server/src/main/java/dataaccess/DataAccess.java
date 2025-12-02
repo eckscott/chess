@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.*;
+import chess.*;
 
 import java.util.Collection;
 
@@ -16,4 +17,5 @@ public interface DataAccess {
     Collection<GameData> listGames() throws DataAccessException;
     void joinGame(String authToken, JoinGameData joinGameReq) throws Exception;
     void removePlayer(String authToken, GameData game);
+    void updateGame(int gameID, ChessMove move) throws InvalidMoveException;
 }

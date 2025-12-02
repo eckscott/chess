@@ -46,6 +46,7 @@ public class Server {
             server.ws("/ws", ws -> {
                 ws.onConnect(wsHandler);
                 ws.onMessage(wsHandler);
+                ws.onClose(wsHandler);
             });
         } catch (DataAccessException e) {
             throw new RuntimeException(e);

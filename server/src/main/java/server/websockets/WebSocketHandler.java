@@ -1,5 +1,6 @@
 package server.websockets;
 
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlDataAccess;
@@ -7,6 +8,7 @@ import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -42,9 +44,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx) {
         try {
             UserGameCommand cmd = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            MakeMoveCommand moveCmd = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
             switch (cmd.getCommandType()){
                 case CONNECT -> playerJoin(cmd, ctx.session);
                 case LEAVE -> playerLeave(cmd, ctx.session);
+                case MAKE_MOVE -> playerMove(moveCmd, ctx.session);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -100,5 +104,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         connections.broadcast(session, new NotificationMessage(message), cmd.getGameID());
         connections.remove(session, cmd.getGameID());
+    }
+
+    private void playerMove(MakeMoveCommand cmd, Session session) throws DataAccessException, InvalidMoveException, IOException {
+        if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
+            userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
+            gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
+            connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
+            connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
+        }
     }
 }
