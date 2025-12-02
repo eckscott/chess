@@ -111,6 +111,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
             connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
+            connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
             connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
         }
     }
