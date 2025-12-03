@@ -1,5 +1,6 @@
 package server.websockets;
 
+import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -113,10 +114,31 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
             userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             try {
-                gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
-                connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
-                connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
-                connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
+                if ((gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE)) ||
+                    (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK)) ||
+                    (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.BLACK)) ||
+                    (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE))){
+                    connections.broadcast(session, new NotificationMessage("Game is over! No more moves can be made"), cmd.getGameID());
+                }
+                else {
+                    gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
+                    connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
+                    connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
+                    if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                        connections.broadcast(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
+                    } else if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                        connections.broadcast(session, new NotificationMessage("Checkmate! Good game! White wins!"), cmd.getGameID());
+                    } else if (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.WHITE)) {
+                        connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
+                    } else if (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+                        connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
+                    } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.WHITE)) {
+                        connections.broadcast(session, new NotificationMessage("White is in Check!"), cmd.getGameID());
+                    } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)) {
+                        connections.broadcast(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
+                    }
+                }
             } catch (InvalidMoveException e) {
                 connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e)), cmd.getGameID());
             }
