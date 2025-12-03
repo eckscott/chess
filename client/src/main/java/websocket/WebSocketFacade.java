@@ -5,6 +5,8 @@ import jakarta.websocket.*;
 import model.AuthData;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import chess.*;
@@ -33,6 +35,12 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
                         notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                    }
+                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                        notificationHandler.errorMessage(new Gson().fromJson(message, ErrorMessage.class));
+                    }
+                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        notificationHandler.loadGame(new Gson().fromJson(message, LoadGameMessage.class));
                     }
                 }
             });

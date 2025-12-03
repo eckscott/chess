@@ -87,6 +87,16 @@ public class ServerFacade {
         throw new InvalidGameException("That game does not exist! Please provide a different gameID\n");
     }
 
+    public GameData getGame(AuthData authorization, int gameID){
+        ListGamesResponse listOfGames = listGames(authorization);
+        for (GameData game : listOfGames.games()){
+            if (game.gameID() == gameID){
+                return game;
+            }
+        }
+        throw new InvalidGameException("That game does not exist! Please provide a different gameID\n");
+    }
+
     public void joinGame(AuthData authorization, JoinGameData joinGameReq){
         var req = buildReq("PUT", "/game", joinGameReq, authorization.authToken());
         var response = sendReq(req);

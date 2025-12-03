@@ -7,6 +7,8 @@ import model.*;
 import server.ServerFacade;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -28,13 +30,13 @@ public class InGame implements NotificationHandler {
 
     public States run() throws Exception {
         if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-            drawWhite(ctx.getCurrGame().game().getBoard());
+            drawWhite(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
         }
         else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-            drawBlack(ctx.getCurrGame().game().getBoard());
+            drawBlack(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
         }
 
-        ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
+        ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -64,16 +66,16 @@ public class InGame implements NotificationHandler {
         return switch (cmd){
             case "quit" -> "quit";
             case "leave" -> {
-                ws.leaveGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
+                ws.leaveGame(ctx.getCurrUser(), ctx.getCurrGame());
                 ctx.setCurrState(States.SIGNEDIN);
                 yield "You've exited the game! ";
             }
             case "redrawchessboard" -> {
                 if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-                    drawWhite(ctx.getCurrGame().game().getBoard());
+                    drawWhite(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
                 }
                 else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-                    drawBlack(ctx.getCurrGame().game().getBoard());
+                    drawBlack(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
                 }
                 yield "Current board ^^^\n";
             }
@@ -101,7 +103,7 @@ public class InGame implements NotificationHandler {
         var oldPos = moveConverter(pos1s);
         var newPos = moveConverter(pos2s);
         var move = new ChessMove(oldPos, newPos, null);
-        ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame().gameID(), move);
+        ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
         return String.format("Made move: %s", move);
     }
 
@@ -446,6 +448,24 @@ public class InGame implements NotificationHandler {
     @Override
     public void notify(NotificationMessage message) {
         System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + message.getMessage());
+        printPrompt();
+    }
+
+    @Override
+    public void errorMessage(ErrorMessage message) {
+        System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_RED + message.getMessage());
+        printPrompt();
+    }
+
+    @Override
+    public void loadGame(LoadGameMessage message) {
+        System.out.print("\n");
+        if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
+            drawWhite(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
+        }
+        else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
+            drawBlack(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
+        }
         printPrompt();
     }
 }
