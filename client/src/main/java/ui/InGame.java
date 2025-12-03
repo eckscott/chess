@@ -29,13 +29,6 @@ public class InGame implements NotificationHandler {
     }
 
     public States run() throws Exception {
-        if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
-            drawWhite(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
-        }
-        else if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-            drawBlack(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
-        }
-
         ws.joinGame(ctx.getCurrUser(), ctx.getCurrGame());
 
         Scanner scanner = new Scanner(System.in);
