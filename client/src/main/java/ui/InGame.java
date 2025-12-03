@@ -63,6 +63,7 @@ public class InGame implements NotificationHandler {
         return switch (cmd){
             case "quit" -> "quit";
             case "leave" -> {
+                ws.leaveGame(ctx.getCurrUser(), ctx.getCurrGame().gameID());
                 ctx.setCurrState(States.SIGNEDIN);
                 yield "You've exited the game! ";
             }
