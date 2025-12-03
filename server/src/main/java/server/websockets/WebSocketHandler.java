@@ -24,12 +24,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final ConnectionManager connections = new ConnectionManager();
     private final UserService userService;
     private final GameService gameService;
+    private boolean resignFlag;
 
     public WebSocketHandler(){
         try {
             var dataAccess = new SqlDataAccess();
             userService = new UserService(dataAccess);
             gameService = new GameService(dataAccess);
+            resignFlag = false;
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -50,6 +52,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case CONNECT -> playerJoin(cmd, ctx.session);
                 case LEAVE -> playerLeave(cmd, ctx.session);
                 case MAKE_MOVE -> playerMove(moveCmd, ctx.session);
+                case RESIGN -> playerResign(cmd, ctx.session);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -114,6 +117,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
             userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             try {
+                if (resignFlag){
+                    throw new InvalidMoveException("The game is already over");
+                }
                 gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
                 connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
                 connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
@@ -139,5 +145,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else{
             connections.sendToSelf(session, new ErrorMessage("ERROR: can't make move as an observer"), cmd.getGameID());
         }
+    }
+
+    private void playerResign(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
+        resignFlag = true;
+        connections.sendToSelf(session, new NotificationMessage(String.format("%s has resigned. Good game!",
+                                userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
+        connections.broadcast(session, new NotificationMessage(String.format("%s has resigned. Good game!",
+                userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
     }
 }
