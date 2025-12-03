@@ -10,6 +10,7 @@ import websocket.WebSocketFacade;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -76,6 +77,7 @@ public class InGame implements NotificationHandler {
                 }
                 yield "Current board ^^^\n";
             }
+            case "makemove" -> makeMove(params);
             default -> help();
         };
     }
@@ -85,11 +87,22 @@ public class InGame implements NotificationHandler {
                 help - lists command options
                 RedrawChessBoard - Redraws the chess board
                 Leave - Leave the game without resigning
-                MakeMove <[start, position]>, <[end, position]> - Moves a piece from start position to end position
+                MakeMove <[start,position]> <[end,position]> - Moves a piece from start position to end position
                 Resign - Forfeit the game and the game is over
                 HighlightLegalMoves <[start, position]> - highlight legal moves for the piece at the indicated position
                 quit - exits the program
                 """;
+    }
+
+    private String makeMove(String... params) throws IOException {
+        String pos1s = params[0].substring(1, params[0].length() - 1);
+        String pos2s = params[1].substring(1, params[1].length() - 1);
+
+        var oldPos = moveConverter(pos1s);
+        var newPos = moveConverter(pos2s);
+        var move = new ChessMove(oldPos, newPos, null);
+        ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame().gameID(), move);
+        return String.format("Made move: %s", move);
     }
 
     private void drawWhite(ChessBoard board) {
@@ -420,6 +433,14 @@ public class InGame implements NotificationHandler {
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN);
             }
         }
+    }
+
+    private ChessPosition moveConverter(String posString){
+        String[] pos = posString.split(",");
+        int r = Integer.parseInt(pos[0]);
+        char colChar = pos[1].charAt(0);
+        int c = Character.toLowerCase(colChar) - 'a'+ 1;
+        return new ChessPosition(r, c);
     }
 
     @Override

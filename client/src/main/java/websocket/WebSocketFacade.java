@@ -3,9 +3,11 @@ package websocket;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import model.AuthData;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
+import chess.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,6 +48,11 @@ public class WebSocketFacade extends Endpoint {
 
     public void leaveGame(AuthData auth, int gameID) throws IOException {
         var cmd = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth.authToken(), gameID);
+        this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+    }
+
+    public void makeMove(AuthData auth, int gameID, ChessMove move) throws IOException {
+        var cmd = new MakeMoveCommand(move, auth.authToken(), gameID);
         this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
     }
 
