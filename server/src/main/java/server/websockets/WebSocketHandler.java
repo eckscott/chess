@@ -107,7 +107,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void playerMove(MakeMoveCommand cmd, Session session) throws DataAccessException, InvalidMoveException, IOException {
-        if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
+        if (userService.getUsername(cmd.getAuthToken()) == null){
+            connections.sendToSelf(session, new ErrorMessage("ERROR that user is not authorized"), cmd.getGameID());
+        }
+        else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
             userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
             connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
