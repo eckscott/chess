@@ -118,8 +118,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
                 connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
             } catch (InvalidMoveException e) {
-                connections.sendToSelf(session, new ErrorMessage("ERROR invalid move"), cmd.getGameID());
+                connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e)), cmd.getGameID());
             }
+        }
+        else{
+            connections.sendToSelf(session, new ErrorMessage("ERROR: can't make move as an observer"), cmd.getGameID());
         }
     }
 }

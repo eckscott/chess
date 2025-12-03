@@ -209,26 +209,34 @@ public class SqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void updateGame(int gameID, ChessMove move) throws InvalidMoveException, DataAccessException {
+    public void updateGame(int gameID, ChessMove move, String authToken) throws InvalidMoveException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
             ChessGame game = new ChessGame();
+            String whiteUsername = "";
+            String blackUsername = "";
             var statement = "SELECT * FROM games WHERE gameID=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 ps.setInt(1, gameID);
                 try (ResultSet rs = ps.executeQuery()){
                     if (rs.next()){
                         var returnedID = rs.getInt("gameID");
-                        var whiteUsername = rs.getString("whiteUsername");
-                        var blackUsername = rs.getString("blackUsername");
+                        whiteUsername = rs.getString("whiteUsername");
+                        blackUsername = rs.getString("blackUsername");
                         var gameName = rs.getString("gameName");
                         var gameJson = rs.getString("game");
                         game = new Gson().fromJson(gameJson, ChessGame.class);
                     }
                 }
             }
-            game.makeMove(move);
-            var newStatement = "UPDATE games SET game = (?) WHERE gameID = (?)";
-            HELPER_METHODS.executeUpdate(newStatement, game, gameID);
+            if ((game.getTeamTurn() == ChessGame.TeamColor.WHITE && getAuth(authToken).equals(whiteUsername)) ||
+                (game.getTeamTurn() == ChessGame.TeamColor.BLACK && getAuth(authToken).equals(blackUsername))) {
+                game.makeMove(move);
+                var newStatement = "UPDATE games SET game = (?) WHERE gameID = (?)";
+                HELPER_METHODS.executeUpdate(newStatement, game, gameID);
+            }
+            else{
+                throw new InvalidMoveException("Can't make a move for the other team");
+            }
         } catch (DataAccessException | SQLException e) {
             throw new DataAccessException(String.format("Unable to get auth from database: %s", e.getMessage()));
         }

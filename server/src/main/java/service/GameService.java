@@ -68,7 +68,7 @@ public class GameService {
         if (authToken == null || dataAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException("unauthorized");
         }
-        dataAccess.updateGame(gameID, move);
+        dataAccess.updateGame(gameID, move, authToken);
     }
 
     public int generateGameID(){

@@ -113,7 +113,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, ChessMove move) throws InvalidMoveException {
+    public void updateGame(int gameID, ChessMove move, String authToken) throws InvalidMoveException {
         GameData updatedGame = games.get(gameID);
         updatedGame.game().makeMove(move);
         games.remove(gameID);

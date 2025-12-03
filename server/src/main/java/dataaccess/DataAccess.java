@@ -17,5 +17,5 @@ public interface DataAccess {
     Collection<GameData> listGames() throws DataAccessException;
     void joinGame(String authToken, JoinGameData joinGameReq) throws Exception;
     void removePlayer(String authToken, GameData game);
-    void updateGame(int gameID, ChessMove move) throws InvalidMoveException, DataAccessException;
+    void updateGame(int gameID, ChessMove move, String authToken) throws InvalidMoveException, DataAccessException;
 }
