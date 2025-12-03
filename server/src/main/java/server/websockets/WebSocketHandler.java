@@ -136,7 +136,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)) {
                     connections.broadcast(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
                 } else {
-                    connections.broadcast(session, new NotificationMessage(cmd.getMove().toString()), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
                 }
             } catch (InvalidMoveException e) {
                 connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e)), cmd.getGameID());
