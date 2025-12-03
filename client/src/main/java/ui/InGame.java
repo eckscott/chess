@@ -423,7 +423,8 @@ public class InGame implements NotificationHandler {
 
     @Override
     public void notify(NotificationMessage message) {
-        System.out.print(message.getMessage());
+        System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + message.getMessage());
+        printPrompt();
     }
 }
 
