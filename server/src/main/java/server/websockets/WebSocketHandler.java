@@ -148,10 +148,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void playerResign(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
-        resignFlag = true;
-        connections.sendToSelf(session, new NotificationMessage(String.format("%s has resigned. Good game!",
-                                userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
-        connections.broadcast(session, new NotificationMessage(String.format("%s has resigned. Good game!",
-                userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
+        if (resignFlag){
+            connections.sendToSelf(session, new ErrorMessage("ERROR: The game is already over"), cmd.getGameID());
+        }
+        else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
+                userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())) {
+            resignFlag = true;
+            connections.sendToSelf(session, new NotificationMessage(String.format("%s has resigned. Good game!",
+                    userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
+            connections.broadcast(session, new NotificationMessage(String.format("%s has resigned. Good game!",
+                    userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
+        }
+        else {
+            connections.sendToSelf(session, new ErrorMessage("ERROR: observers can't resign"), cmd.getGameID());
+        }
     }
 }
