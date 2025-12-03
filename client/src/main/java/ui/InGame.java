@@ -73,6 +73,10 @@ public class InGame implements NotificationHandler {
                 yield "Current board ^^^\n";
             }
             case "makemove" -> makeMove(params);
+            case "resign" -> {
+                ws.resign(ctx.getCurrUser(), ctx.getCurrGame());
+                yield "";
+            }
             default -> help();
         };
     }
