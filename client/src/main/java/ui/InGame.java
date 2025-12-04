@@ -132,7 +132,7 @@ public class InGame implements NotificationHandler {
     }
 
     private String highlightLegalMoves(String... params){
-        String posString = params[0];
+        String posString = params[0].substring(1, params[0].length() - 1);
         ChessPosition pos = moveConverter(posString);
         ChessBoard board = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard();
         Collection<ChessMove> legalMoves = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(pos);
@@ -144,7 +144,7 @@ public class InGame implements NotificationHandler {
                 System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
                         EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 1)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 1)));
@@ -155,7 +155,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 2)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 2)));
@@ -166,7 +166,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 3)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 3)));
@@ -177,7 +177,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 4)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 4)));
@@ -188,7 +188,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 5)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 5)));
@@ -199,7 +199,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 6)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 6)));
@@ -210,7 +210,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 7)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 7)));
@@ -221,7 +221,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i, 8)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i, 8)));
@@ -234,7 +234,7 @@ public class InGame implements NotificationHandler {
                 System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
                         EscapeSequences.SET_BG_COLOR_RED, i - 1);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 1)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
@@ -245,7 +245,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 2)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
@@ -256,7 +256,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 3)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
@@ -267,7 +267,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 4)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
@@ -278,7 +278,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 5)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
@@ -289,7 +289,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 6)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
@@ -300,7 +300,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 7)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
@@ -311,7 +311,7 @@ public class InGame implements NotificationHandler {
 
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
                 if (board.getPiece(new ChessPosition(i - 1, 8)) != null) {
                     drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
