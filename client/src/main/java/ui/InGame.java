@@ -14,6 +14,7 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class InGame implements NotificationHandler {
@@ -77,6 +78,7 @@ public class InGame implements NotificationHandler {
                 ws.resign(ctx.getCurrUser(), ctx.getCurrGame());
                 yield "";
             }
+            case "highlightlegalmoves" -> highlightLegalMoves(params);
             default -> help();
         };
     }
@@ -88,7 +90,7 @@ public class InGame implements NotificationHandler {
                 Leave - Leave the game without resigning
                 MakeMove <[start,position]> <[end,position]> - Moves a piece from start position to end position
                 Resign - Forfeit the game and the game is over
-                HighlightLegalMoves <[start, position]> - highlight legal moves for the piece at the indicated position
+                HighlightLegalMoves <[start,position]> - highlight legal moves for the piece at the indicated position
                 quit - exits the program
                 """;
     }
@@ -97,11 +99,18 @@ public class InGame implements NotificationHandler {
         String pos1s = params[0].substring(1, params[0].length() - 1);
         String pos2s = params[1].substring(1, params[1].length() - 1);
 
-        var oldPos = moveConverter(pos1s);
-        var newPos = moveConverter(pos2s);
+        ChessPosition oldPos = moveConverter(pos1s);
+        ChessPosition newPos = moveConverter(pos2s);
         var move = new ChessMove(oldPos, newPos, null);
         ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
         return String.format("Made move: %s", move);
+    }
+
+    private String highlightLegalMoves(String... params){
+        String posString = params[0];
+        ChessPosition pos = moveConverter(posString);
+        Collection<ChessMove> legalMoves =
+        return "";
     }
 
     private void drawWhite(ChessBoard board) {
