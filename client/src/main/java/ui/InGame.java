@@ -13,6 +13,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
@@ -102,14 +103,184 @@ public class InGame implements NotificationHandler {
         ChessPosition oldPos = moveConverter(pos1s);
         ChessPosition newPos = moveConverter(pos2s);
         var move = new ChessMove(oldPos, newPos, null);
+
+        Collection<ChessMove> promoteMoves = new ArrayList<>();
+        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.ROOK));
+        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.KNIGHT));
+        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.BISHOP));
+        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.QUEEN));
+
+        if (server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(oldPos).containsAll(promoteMoves)){
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Please type which piece you would like to promote to:\n" +
+                    "queen, bishop, knight, rook");
+            printPrompt();
+            Scanner scanner = new Scanner(System.in);
+            String inputPiece = scanner.nextLine();
+            move = new ChessMove(oldPos, newPos, promote(inputPiece));
+        }
         ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
         return String.format("Made move: %s", move);
+    }
+
+    private ChessPiece.PieceType promote(String desiredPiece){
+        return switch(desiredPiece){
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            default -> ChessPiece.PieceType.QUEEN;
+        };
     }
 
     private String highlightLegalMoves(String... params){
         String posString = params[0];
         ChessPosition pos = moveConverter(posString);
-        Collection<ChessMove> legalMoves =
+        ChessBoard board = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard();
+        Collection<ChessMove> legalMoves = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(pos);
+        if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+              "   " + " a " + "  b  "  + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+
+            for (int i = 8; i >=1; i=i-2){
+                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                        EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
+                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))){
+                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                }
+                if (board.getPiece(new ChessPosition(i, 1)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 1)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i, 2)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 2)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i, 3)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 3)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i, 4)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 4)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i, 5)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 5)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i, 6)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 6)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i, 7)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 7)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i, 8)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i, 8)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                        EscapeSequences.SET_BG_COLOR_RED, i - 1);
+                if (board.getPiece(new ChessPosition(i - 1, 1)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i - 1, 2)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i - 1, 3)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i - 1, 4)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i - 1, 5)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i - 1, 6)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                if (board.getPiece(new ChessPosition(i - 1, 7)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                if (board.getPiece(new ChessPosition(i - 1, 8)) != null) {
+                    drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
+                }
+                else{
+                    System.out.print(EscapeSequences.EMPTY);
+                }
+
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+            }
+
+            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                    "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+        }
         return "";
     }
 
