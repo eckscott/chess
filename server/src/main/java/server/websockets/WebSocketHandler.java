@@ -18,20 +18,22 @@ import websocket.messages.NotificationMessage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private final UserService userService;
     private final GameService gameService;
-    private boolean resignFlag;
+    private Map<Integer, Boolean> resignFlag;
 
     public WebSocketHandler(){
         try {
             var dataAccess = new SqlDataAccess();
             userService = new UserService(dataAccess);
             gameService = new GameService(dataAccess);
-            resignFlag = false;
+            resignFlag = new ConcurrentHashMap<>();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -97,6 +99,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var loadGameMsg = new LoadGameMessage(gameService.getGame(cmd.getGameID()).game());
             connections.sendToSelf(session, loadGameMsg, cmd.getGameID());
             connections.broadcast(session, notificationMsg, cmd.getGameID());
+            resignFlag.put(cmd.getGameID(), false);
         }
     }
 
@@ -117,12 +120,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
             userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())){
             try {
-                if (resignFlag){
+                if (resignFlag.get(cmd.getGameID())){
                     throw new InvalidMoveException("The game is already over");
                 }
                 gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
                 connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
                 connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
+                connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
                 if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
                     connections.broadcast(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
                     connections.sendToSelf(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
@@ -141,8 +145,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)) {
                     connections.broadcast(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
                     connections.sendToSelf(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
-                } else {
-                    connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
                 }
             } catch (InvalidMoveException e) {
                 connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e.getMessage())), cmd.getGameID());
@@ -154,12 +156,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void playerResign(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
-        if (resignFlag){
+        if (resignFlag.get(cmd.getGameID())){
             connections.sendToSelf(session, new ErrorMessage("ERROR: The game is already over"), cmd.getGameID());
         }
         else if (userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).whiteUsername()) ||
                 userService.getUsername(cmd.getAuthToken()).equals(gameService.getGame(cmd.getGameID()).blackUsername())) {
-            resignFlag = true;
+            resignFlag.put(cmd.getGameID(), true);
             connections.sendToSelf(session, new NotificationMessage(String.format("%s has resigned. Good game!",
                     userService.getUsername(cmd.getAuthToken()))), cmd.getGameID());
             connections.broadcast(session, new NotificationMessage(String.format("%s has resigned. Good game!",
