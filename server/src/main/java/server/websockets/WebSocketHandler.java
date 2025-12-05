@@ -125,16 +125,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
                 if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
                     connections.broadcast(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                     connections.broadcast(session, new NotificationMessage("Checkmate! Good game! White wins!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("Checkmate! Good game! White wins!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.WHITE)) {
                     connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.BLACK)) {
                     connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.WHITE)) {
                     connections.broadcast(session, new NotificationMessage("White is in Check!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("White is in Check!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)) {
                     connections.broadcast(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
                 } else {
                     connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
                 }

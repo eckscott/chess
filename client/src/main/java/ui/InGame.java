@@ -77,8 +77,17 @@ public class InGame implements NotificationHandler {
             }
             case "m" -> makeMove(params);
             case "r" -> {
-                ws.resign(ctx.getCurrUser(), ctx.getCurrGame());
-                yield "";
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Are you sure you want to resign? (y/n):\n");
+                printPrompt();
+                Scanner scanner = new Scanner(System.in);
+                String confirmation = scanner.nextLine();
+                if (confirmation.equals("y")) {
+                    ws.resign(ctx.getCurrUser(), ctx.getCurrGame());
+                    yield "";
+                }
+                else {
+                    yield "The game goes on!\n";
+                }
             }
             case "h" -> highlightLegalMoves(params);
             default -> help();
