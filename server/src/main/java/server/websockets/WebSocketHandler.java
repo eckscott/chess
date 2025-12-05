@@ -139,7 +139,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
                 }
             } catch (InvalidMoveException e) {
-                connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e)), cmd.getGameID());
+                connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e.getMessage())), cmd.getGameID());
             }
         }
         else{
