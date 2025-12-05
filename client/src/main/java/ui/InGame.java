@@ -3,6 +3,7 @@ package ui;
 import chess.*;
 import client.ClientContext;
 import client.States;
+import exceptions.InvalidInputException;
 import model.*;
 import server.ServerFacade;
 import websocket.NotificationHandler;
@@ -60,12 +61,12 @@ public class InGame implements NotificationHandler {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd){
             case "quit" -> "quit";
-            case "leave" -> {
+            case "l" -> {
                 ws.leaveGame(ctx.getCurrUser(), ctx.getCurrGame());
                 ctx.setCurrState(States.SIGNEDIN);
                 yield "You've exited the game! ";
             }
-            case "redrawchessboard" -> {
+            case "board" -> {
                 if (ctx.getCurrRole() == ChessGame.TeamColor.WHITE){
                     drawWhite(server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard());
                 }
@@ -74,12 +75,12 @@ public class InGame implements NotificationHandler {
                 }
                 yield "Current board ^^^\n";
             }
-            case "makemove" -> makeMove(params);
-            case "resign" -> {
+            case "m" -> makeMove(params);
+            case "r" -> {
                 ws.resign(ctx.getCurrUser(), ctx.getCurrGame());
                 yield "";
             }
-            case "highlightlegalmoves" -> highlightLegalMoves(params);
+            case "h" -> highlightLegalMoves(params);
             default -> help();
         };
     }
@@ -87,39 +88,50 @@ public class InGame implements NotificationHandler {
     public String help() {
         return """
                 help - lists command options
-                RedrawChessBoard - Redraws the chess board
-                Leave - Leave the game without resigning
-                MakeMove <[start,position]> <[end,position]> - Moves a piece from start position to end position
-                Resign - Forfeit the game and the game is over
-                HighlightLegalMoves <[start,position]> - highlight legal moves for the piece at the indicated position
+                board - Redraws the chess board
+                l - Leave the game without resigning
+                m <[start,position]> <[end,position]> - Moves a piece from start position to end position
+                r - Forfeit the game and the game is over
+                h <[start,position]> - highlight legal moves for the piece at the indicated position
                 quit - exits the program
                 """;
     }
 
     private String makeMove(String... params) throws IOException {
-        String pos1s = params[0].substring(1, params[0].length() - 1);
-        String pos2s = params[1].substring(1, params[1].length() - 1);
+        try {
+            if (params.length != 2) {
+                throw new InvalidInputException("Invalid number of parameters provide! Please provide [start,position] [end,position]");
+            }
+            String pos1s = params[0].substring(1, params[0].length() - 1);
+            String pos2s = params[1].substring(1, params[1].length() - 1);
 
-        ChessPosition oldPos = moveConverter(pos1s);
-        ChessPosition newPos = moveConverter(pos2s);
-        var move = new ChessMove(oldPos, newPos, null);
+            ChessPosition oldPos = moveConverter(pos1s);
+            ChessPosition newPos = moveConverter(pos2s);
+            var move = new ChessMove(oldPos, newPos, null);
 
-        Collection<ChessMove> promoteMoves = new ArrayList<>();
-        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.ROOK));
-        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.KNIGHT));
-        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.BISHOP));
-        promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.QUEEN));
+            Collection<ChessMove> promoteMoves = new ArrayList<>();
+            promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.ROOK));
+            promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.KNIGHT));
+            promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.BISHOP));
+            promoteMoves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.QUEEN));
 
-        if (server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(oldPos).containsAll(promoteMoves)){
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Please type which piece you would like to promote to:\n" +
-                    "queen, bishop, knight, rook");
-            printPrompt();
-            Scanner scanner = new Scanner(System.in);
-            String inputPiece = scanner.nextLine();
-            move = new ChessMove(oldPos, newPos, promote(inputPiece));
+            if (server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(oldPos).containsAll(promoteMoves)) {
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Please type which piece you would like to promote to:\n" +
+                        "queen, bishop, knight, rook");
+                printPrompt();
+                Scanner scanner = new Scanner(System.in);
+                String inputPiece = scanner.nextLine();
+                move = new ChessMove(oldPos, newPos, promote(inputPiece));
+            }
+            ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
+            return String.format("Made move: %s", move);
+        } catch (InvalidInputException e){
+            System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: " + e.getMessage() + "\n");
+            return "";
+        } catch (NumberFormatException e){
+            System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Incorrect move format\n");
+            return "";
         }
-        ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
-        return String.format("Made move: %s", move);
     }
 
     private ChessPiece.PieceType promote(String desiredPiece){
@@ -132,391 +144,369 @@ public class InGame implements NotificationHandler {
     }
 
     private String highlightLegalMoves(String... params){
-        String posString = params[0].substring(1, params[0].length() - 1);
-        ChessPosition pos = moveConverter(posString);
-        ChessBoard board = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard();
-        Collection<ChessMove> legalMoves = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(pos);
-        if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK){
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                    "   " + " h " + "  g  "  + " f " + " e " + "  d " + " c " + "  b " + "  a  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-
-            for (int i = 1; i <=8; i=i+2){
-                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
-                        EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 8)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 8)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 7)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 7)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 6)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 6)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 5)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 5)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 4)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 4)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 3)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 3)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 2)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 2)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 1)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 1)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
-                        EscapeSequences.SET_BG_COLOR_RED, i + 1);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 8)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 8)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 7)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 7)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 6)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 6)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 5)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 5)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 4)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 4)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 3)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 3)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 2)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 2)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i + 1, 1)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i + 1, 1)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
-
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+        try {
+            if (params.length != 1){
+                throw new InvalidInputException("Invalid number of parameters provided! Please provide [chess,position]");
             }
+            String posString = params[0].substring(1, params[0].length() - 1);
+            ChessPosition pos = moveConverter(posString);
+            ChessBoard board = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard();
+            Collection<ChessMove> legalMoves = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(pos);
+            if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                        "   " + " h " + "  g  " + " f " + " e " + "  d " + " c " + "  b " + "  a  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
 
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                    "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-        }
-        else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-              "   " + " a " + "  b  "  + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+                for (int i = 1; i <= 8; i = i + 2) {
+                    System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                            EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 8), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 8)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 8)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-            for (int i = 8; i >=1; i=i-2){
-                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
-                        EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 1)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 1)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 7), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 7)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 7)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 2)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 2)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 6), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 6)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 6)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 3)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 3)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 5), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 5)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 5)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 4)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 4)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 4), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 4)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 4)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 5)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 5)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 3), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 3)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 3)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 6)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 6)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 2), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 2)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 2)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 7)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 7)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 1)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 1)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i, 8)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i, 8)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+                    System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                            EscapeSequences.SET_BG_COLOR_RED, i + 1);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 8), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 8)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 8)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-                System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
-                        EscapeSequences.SET_BG_COLOR_RED, i - 1);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 1), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 1)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 7), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 7)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 7)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 2), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 2)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 6), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 6)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 6)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 3), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 3)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 5), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 5)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 5)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 4), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 4)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 4), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 4)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 4)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 5), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 5)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 3), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 3)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 3)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 6), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 6)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
-                }
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 2), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 2)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 2)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 7), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 7)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i + 1, 1), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i + 1, 1)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i + 1, 1)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
                 }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 8), null))){
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                }
-                if (board.getPiece(new ChessPosition(i - 1, 8)) != null) {
-                    drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
-                }
-                else{
-                    System.out.print(EscapeSequences.EMPTY);
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                        "   " + "   " + "     " + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                        "   " + " a " + "  b  " + " c " + " d " + "  e " + " f " + "  g " + "  h  " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+
+                for (int i = 8; i >= 1; i = i - 2) {
+                    System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                            EscapeSequences.SET_BG_COLOR_LIGHT_GREY, i);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 1), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 1)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 1)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 2), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 2)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 2)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 3), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 3)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 3)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 4), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 4)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 4)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 5), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 5)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 5)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 6), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 6)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 6)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 7), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 7)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 7)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i, 8), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i, 8)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i, 8)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+                    System.out.printf(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + " %d " +
+                            EscapeSequences.SET_BG_COLOR_RED, i - 1);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 1), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 1)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 1)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 2), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 2)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 2)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 3), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 3)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 3)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 4), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 4)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 4)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 5), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 5)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 5)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 6), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 6)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 6)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_RED);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 7), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 7)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 7)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    if (legalMoves.contains(new ChessMove(pos, new ChessPosition(i - 1, 8), null))) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if (board.getPiece(new ChessPosition(i - 1, 8)) != null) {
+                        drawPiece(board.getPiece(new ChessPosition(i - 1, 8)));
+                    } else {
+                        System.out.print(EscapeSequences.EMPTY);
+                    }
+
+                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
                 }
 
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
+                        "   " + "   " + "     " + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
             }
-
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
-                    "   " + "   " + "     "  + "   " + "   " + "    " + "   " + "    " + "     " + "  " + EscapeSequences.SET_BG_COLOR_BLACK + "\n");
-        }
+            return "";
+        } catch (InvalidInputException e){
+            System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: " + e.getMessage() + "\n");
+            return "";
+        } catch (NumberFormatException e){
+        System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: Incorrect move format\n");
         return "";
+        }
     }
 
     private void drawWhite(ChessBoard board) {
