@@ -126,13 +126,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 gameService.makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove());
                 connections.broadcast(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
                 connections.sendToSelf(session, new LoadGameMessage(gameService.getGame(cmd.getGameID()).game()), cmd.getGameID());
-                connections.broadcast(session, new NotificationMessage(String.format("Move made: %s", cmd.getMove())), cmd.getGameID());
+                connections.broadcast(session, new NotificationMessage(String.format("%s made move: %s", userService.getUsername(cmd.getAuthToken()), cmd.getMove())), cmd.getGameID());
                 if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                    connections.broadcast(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
-                    connections.sendToSelf(session, new NotificationMessage("Checkmate! Good game! Black wins!"), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(String.format("Checkmate! Good game! %s wins!", gameService.getGame(cmd.getGameID()).blackUsername())), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage(String.format("Checkmate! Good game! %s wins!", gameService.getGame(cmd.getGameID()).blackUsername())), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                    connections.broadcast(session, new NotificationMessage("Checkmate! Good game! White wins!"), cmd.getGameID());
-                    connections.sendToSelf(session, new NotificationMessage("Checkmate! Good game! White wins!"), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(String.format("Checkmate! Good game! %s wins!", gameService.getGame(cmd.getGameID()).whiteUsername())), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage(String.format("Checkmate! Good game! %s wins!", gameService.getGame(cmd.getGameID()).whiteUsername())), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInStalemate(ChessGame.TeamColor.WHITE)) {
                     connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
                     connections.sendToSelf(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
@@ -140,11 +140,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connections.broadcast(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
                     connections.sendToSelf(session, new NotificationMessage("Stalemate! Good game!"), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.WHITE)) {
-                    connections.broadcast(session, new NotificationMessage("White is in Check!"), cmd.getGameID());
-                    connections.sendToSelf(session, new NotificationMessage("White is in Check!"), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(String.format("%s is in check!", gameService.getGame(cmd.getGameID()).whiteUsername())), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage(String.format("%s is in check!", gameService.getGame(cmd.getGameID()).whiteUsername())), cmd.getGameID());
                 } else if (gameService.getGame(cmd.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)) {
-                    connections.broadcast(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
-                    connections.sendToSelf(session, new NotificationMessage("Black is in Check!"), cmd.getGameID());
+                    connections.broadcast(session, new NotificationMessage(String.format("%s is in check!", gameService.getGame(cmd.getGameID()).blackUsername())), cmd.getGameID());
+                    connections.sendToSelf(session, new NotificationMessage(String.format("%s is in check!", gameService.getGame(cmd.getGameID()).blackUsername())), cmd.getGameID());
                 }
             } catch (InvalidMoveException e) {
                 connections.sendToSelf(session, new ErrorMessage(String.format("ERROR: %s", e.getMessage())), cmd.getGameID());

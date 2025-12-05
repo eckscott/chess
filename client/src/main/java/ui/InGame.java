@@ -133,7 +133,7 @@ public class InGame implements NotificationHandler {
                 move = new ChessMove(oldPos, newPos, promote(inputPiece));
             }
             ws.makeMove(ctx.getCurrUser(), ctx.getCurrGame(), move);
-            return String.format("Made move: %s", move);
+            return "";
         } catch (InvalidInputException e){
             System.out.printf(EscapeSequences.SET_TEXT_COLOR_RED + "ERROR: " + e.getMessage() + "\n");
             return "";
@@ -160,6 +160,9 @@ public class InGame implements NotificationHandler {
             String posString = params[0].substring(1, params[0].length() - 1);
             ChessPosition pos = moveConverter(posString);
             ChessBoard board = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().getBoard();
+            if (board.getPiece(pos) == null){
+                throw new InvalidInputException("There's no piece there!");
+            }
             Collection<ChessMove> legalMoves = server.getGame(ctx.getCurrUser(), ctx.getCurrGame()).game().validMoves(pos);
             if (ctx.getCurrRole() == ChessGame.TeamColor.BLACK) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK +
